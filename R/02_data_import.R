@@ -7,8 +7,16 @@ source("R/01_helper_functions.R")
 End_date <- as.Date("2019-04-30")
 Start_date <- as.Date("2018-04-30")
 
-citycode = "24735"
+citycode = "3513"
 cityname = "Prince Edward County"
+
+city <- 
+  get_census(
+    dataset = "CA16", 
+    regions = list(CMA = citycode),  
+    level = "CMA",
+    geo_format = "sf") %>% 
+  st_transform(32618)
 
 variables_pop = c("v_CA16_401", "v_CA16_402","v_CA16_403","v_CA16_404","v_CA16_405","v_CA16_406")
 variables_pop_names = 
@@ -110,25 +118,8 @@ property <-
   select(-Property_Type)
 
 
-## test (remove when we get daily)
-
-property1 <-
-  property %>% 
-  filter(Scraped >= Start_date,
-         Created <= End_date) %>%
-  st_join(st_buffer(DA["geometry"], 200),
-          join = st_within, left = FALSE)
-
-mapview(property1)
-
-viewmap
-
-
-###### NOTHING UNDER HERE WORKS WITHOUT DAILY ######
-
-
 daily <- 
-  read_csv("data/Whitehorse_daily.csv", col_types = cols(
+  read_csv("data/PEC_daily.csv", col_types = cols(
     `Property_ID` = col_character(),
     Date = col_date(format = ""),
     Status = col_factor(levels = c("U", "B", "A", "R")),
@@ -151,7 +142,7 @@ property <-
   filter(Property_ID %in% daily$Property_ID,
          Scraped >= Start_date,
          Created <= End_date) %>% 
-  st_join(st_buffer(DA["geometry"], 200),
+    st_join(st_buffer(city["geometry"], 200),
           join = st_within, left = FALSE)
 
 daily <- 
