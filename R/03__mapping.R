@@ -16,21 +16,49 @@ streets <-
   st_transform(32618) %>%
   select(osm_id, name, geometry)
 
+water <-read_sf("data","lhy_000c16a_e") 
+water <- st_union(st_combine(water))
+coastal_water <- read_sf("data", "lhy_000h16a_e")
+coastal_water <- st_union(st_combine(coastal_water))
+
+
+
+  
+  
 ## CREATE BASEMAP 
-figure <- list()
 
 base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
-                                   ylim=c(0.01, 1.05), relative = TRUE),
-                     unit = "km") +
+                                ylim=c(0.01, 1.05), relative = TRUE),
+                                unit = "km") +
   tm_fill(col = "#f0f0f0") +
-  tm_shape(DA) +
-  tm_fill(col = "grey80", title = "Base Map") +
+#  tm_shape(streets)+
+#  tm_lines(col = "grey60") +
+#  tm_shape(coastal_water)+
+#  tm_fill(col = "black") + 
+#  tm_shape(water)+
+#  tm_fill(col = "black") +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
   tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
             legend.title.fontfamily = "Futura-CondensedExtraBold",
             legend.position = c("right", "top"),
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold")
+
+
+inset_map <- DA %>% filter (GEOUID == 35130064 | GEOUID == 5130065| GEOUID == 35130063)
+
+m_picton <- tm_shape(inset_map) + 
+  tm_polygons(col = "green")
+
+inset_picton <- viewport(x = 0.8, y = .4, width = 0.2, height = 0.2)
+
+base_map
+print(m_picton, vp = inset_picton)
+
+
+
+#create an inset
+
 
 ### MAPPING LISTINGS
 #Map of Listing Type (Entire Home, Private Room or Shared Room) and Revenue
@@ -65,12 +93,16 @@ tm_shape(property, ext = 1.2)+
 
 ### MAPPING CENSUS VARIABLES
 
+#figure2 <- 
   base_map +
   tm_shape(DA) +
-  tm_polygons(col = "lowinc", 
+  tm_polygons(col = "rentpressure_both", 
               palette = "Greens",
               border.col = "#f0f0f0",
               title = "") +
-  tm_layout(title = "Figure 1. Title")
+  tm_layout(title = "Figure 1. Housing Pressure - Households Spending More than 30% on Housing, Renters and Homeowners")
+  
+  
+  
 
-names(DA[,47])
+  
