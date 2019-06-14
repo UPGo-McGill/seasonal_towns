@@ -10,11 +10,50 @@ Start_date <- as.Date("2018-04-30")
 citycode = "24735"
 cityname = "Prince Edward County"
 
+variables_pop = c("v_CA16_401", "v_CA16_402","v_CA16_403","v_CA16_404","v_CA16_405","v_CA16_406")
+variables_pop_names = 
+variables_housing = c("v_CA16_4843", "v_CA16_4844", "v_CA16_4845", "v_CA16_4846", "v_CA16_4847", "v_CA16_4848",
+                      "v_CA16_4862", "v_CA16_4863", "v_CA16_4864", "v_CA16_4865", "v_CA16_4866", "v_CA16_4867", "v_CA16_4868", "v_CA16_4869",
+                      "v_CA16_4836", "v_CA16_4837", "v_CA16_4838", 
+                      "v_CA16_4886", "v_CA16_4888",
+                      "v_CA16_4892", "v_CA16_4899",
+                      "v_CA16_4900", "v_CA16_4901",
+                      "v_CA16_4893", "v_CA16_4894",
+                      "v_CA16_4895", "v_CA16_4896",
+                      "v_CA16_6692", "v_CA16_6698",
+                      "v_CA16_6719", "v_CA16_6725")
+variables_income = c("v_CA16_2207", "v_CA16_2540")
+
 DA <-
   get_census(
     dataset = 'CA16',regions=list(CD="3513"), level = 'DA', 
+    vectors =  c(variables_pop, variables_housing, variables_income),
     geo_format = "sf") %>%
   st_transform(32618) 
+
+names(DA) <- c("area","type","dwellings1","households1", "GEOUID", "population1",
+               "CD_UID", "CSD_UID","region","area2", "pop","pop11","pop_change",
+               "dwellings","dwellings_usual_residents","pop_dens",
+               "total_bedrooms", "bedrooms0","bedrooms1","bedrooms2","bedrooms3","bedrooms4",
+               "total_tenure", "owner", "renter", 
+               "constructed_total", "constructed_before1961","constructed_196180","constructed_198190","constructed_199100", "constructed_200105", "constructed_200610", "constructed_201116",
+               "total_rentpressure","rentpressure_both","rentpressure_owner","rentpressure_renter",
+               "medianrent","avgrent",
+               "medianownershipcosts", "avgownershipcosts",
+               "mediandwellingvalue","avgdwellingvalue",
+               "total_mobility1","movers1year", "total_mobility5", "movers5year",
+               "medinc", "lowinc","geometry")
+DA <- 
+  DA %>% 
+  mutate(owner = owner/total_tenure,
+              renter = renter/total_tenure,
+              rentpressure_both = rentpressure_both/total_rentpressure,
+              movers1year = movers1year/total_mobility1,
+              movers5year = movers5year/total_mobility5) %>% 
+  select(-type,-dwellings1,-households1,-population1,region,-area2,-total_tenure,-total_rentpressure,-total_mobility1,-total_mobility5)
+
+
+#propertyfiles
 
 property <-
   read_csv("data/PEC_property.csv", col_types = cols_only(
@@ -81,6 +120,7 @@ property1 <-
           join = st_within, left = FALSE)
 
 mapview(property1)
+
 viewmap
 
 
