@@ -16,13 +16,13 @@ streets <-
   st_transform(32618) %>%
   select(osm_id, name, geometry)
 
+# IMPORT WATER
+
 water <-read_sf("data","lhy_000c16a_e") 
 water <- st_union(st_combine(water))
 coastal_water <- read_sf("data", "lhy_000h16a_e")
 coastal_water <- st_union(st_combine(coastal_water))
-
-
-
+z
   
   
 ## CREATE BASEMAP 
@@ -44,32 +44,47 @@ base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold")
 
+m_picton <- 
+  tm_shape(st_buffer(filter(DA, GEOUID == 35130064 | GEOUID == 5130065| 
+                    GEOUID == 35130063),200)) + 
+  tm_borders(col = "white")+
+  tm_shape(filter(DA, GEOUID == 35130064 | GEOUID == 5130065| 
+                    GEOUID == 35130063 ))+
+  tm_borders(col="grey")+
+  tm_shape(property)+
+  tm_dots(col = "Listing_Type",
+          scale = 4/3, 
+          palette = get_brewer_pal("-Dark2", n = 3), 
+          alpha = 0.6, 
+          size = "revenue", 
+          title.size = "Revenue", 
+          size.lim = c(0, 100000),
+          legend.show = FALSE,
+          legend.size.show = FALSE) +
+  tm_layout(legend.position = c("left", "bottom"),
+            frame = TRUE, legend.bg.alpha = 0.6, legend.bg.color = "white") 
+  
+inset_picton <- viewport(x = 0.9, y = .8, width = 0.4, height = 0.4)
 
-inset_map <- DA %>% filter (GEOUID == 35130064 | GEOUID == 5130065| GEOUID == 35130063)
-
-m_picton <- tm_shape(inset_map) + 
-  tm_polygons(col = "green")
-
-inset_picton <- viewport(x = 0.8, y = .4, width = 0.2, height = 0.2)
-
-base_map
+figure1
 print(m_picton, vp = inset_picton)
 
-
-
+library(grid)
 #create an inset
 
 
 ### MAPPING LISTINGS
 #Map of Listing Type (Entire Home, Private Room or Shared Room) and Revenue
 
-#figure1 <- 
+figure1 <- 
 tm_shape(property, ext = 1.2)+
   tm_dots(scale = 0)+
   #  tm_shape(streets)+
   #  tm_lines(col="grey", alpha = 0.5)+
   tm_shape(city) +
   tm_borders(lwd = 1) + 
+  tm_shape(DA)+
+  tm_borders(col="grey")+
   tm_shape(property)+
   tm_dots(col = "Listing_Type",
           scale = 4/3, 
