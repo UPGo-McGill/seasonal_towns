@@ -32,35 +32,143 @@ variables_housing = c("v_CA16_4843", "v_CA16_4844", "v_CA16_4845", "v_CA16_4846"
                       "v_CA16_6719", "v_CA16_6725")
 variables_income = c("v_CA16_2207", "v_CA16_2540")
 
-DA <-
+DA16 <-
   get_census(
     dataset = 'CA16',regions=list(CD="3513"), level = 'DA', 
     vectors =  c(variables_pop, variables_housing, variables_income),
     geo_format = "sf") %>%
   st_transform(32618) 
 
-names(DA) <- c("area","type","dwellings1","households1", "GEOUID", "population1",
+
+names(DA16) <- c("area","type","dwellings1","households1", "GEOUID", "population1",
                "CD_UID", "CSD_UID","region","area2", "pop","pop11","pop_change",
                "dwellings","dwellings_usual_residents","pop_dens",
                "total_bedrooms", "bedrooms0","bedrooms1","bedrooms2","bedrooms3","bedrooms4",
                "total_tenure", "owner", "renter", 
                "constructed_total", "constructed_before1961","constructed_196180","constructed_198190","constructed_199100", "constructed_200105", "constructed_200610", "constructed_201116",
                "total_rentpressure","rentpressure_both","rentpressure_owner","rentpressure_renter",
-               "medianrent","avgrent",
+               "medianrent",
                "medianownershipcosts", "avgownershipcosts",
                "mediandwellingvalue","avgdwellingvalue",
+               "avgrent",
                "total_mobility1","movers1year", "total_mobility5", "movers5year",
                "medinc", "lowinc","geometry")
-DA <- 
-  DA %>% 
-  mutate(owner = owner/total_tenure,
+DA16 <- 
+  DA16 %>% 
+  mutate(dwellings_usual_residents = dwellings_usual_residents/dwellings,
+         owner = owner/total_tenure,
               renter = renter/total_tenure,
               rentpressure_both = rentpressure_both/total_rentpressure,
               movers1year = movers1year/total_mobility1,
               movers5year = movers5year/total_mobility5) %>% 
-  select(-type,-dwellings1,-households1,-population1,region,-area2,-total_tenure,-total_rentpressure,-total_mobility1,-total_mobility5)
+  select(-type,-dwellings1,-households1,-population1,-region,-area2,-total_tenure,-total_rentpressure,-total_mobility1,-total_mobility5)
 
 
+DA11 <-
+  get_census(
+    dataset = 'CA11',regions=list(CD="3513"), level = 'DA', 
+    vectors =  c("v_CA11N_2252", #tenure_total,
+                 "v_CA11N_2253", #owners,
+                 "v_CA11N_2254", #renters,
+                 "v_CA11F_3", #usual resident
+                 "v_CA11N_2283", #ownerpressure,
+                 "v_CA11N_2290", #rentpressure,
+                 "v_CA11N_2291", #medianrent, 
+                 "v_CA11N_2292", #avgrent,
+                 "v_CA11N_2284", #medianowncosts,
+                 "v_CA11N_2285", #avghomecosts,
+                 "v_CA11N_2286", #mediandwellingvalue,
+                 "v_CA11N_2287", #avgdwellingvalue
+                 "v_CA11N_2606", #lowinc
+                 "v_CA11N_1717", #mobilitytotal,
+                 "v_CA11N_1723", #movers1year
+                 "v_CA11N_1744", #mobilitytotal5,
+                 "v_CA11N_1750"), #movers5year
+    geo_format = "sf") %>%
+  st_transform(32618) 
+
+names(DA11) <- c("area", "quality_flags", "type", "dwellings", "households", "GeoUID", "NHS_nonreturn", "population", "CDUID", "CSD_UID", "Region","area2","NHS_nonreturn2","total_tenure","owner","renter","rentpressure_owner","rentpressure_renter","medianrent","avgrent","medianownership","avgownership","mediandwellingvalue","avgdwellingvalue","lowinc","total_mobility1","movers1year","total_mobility5","movers5year", "usual_residents", "geometry")
+
+DA11 <-
+  DA11 %>%   
+  mutate(owner = owner/total_tenure,
+              renter = renter/total_tenure,
+              movers1year = movers1year/total_mobility1,
+              movers5year = movers5year/total_mobility5,
+              usual_residents = usual_residents/dwellings) %>% 
+  select(-quality_flags,-type,-NHS_nonreturn,-CDUID,-CSD_UID,-Region,-area2,-NHS_nonreturn2, -total_tenure,-total_mobility1,-total_mobility5)
+
+DA06 <-
+  get_census(
+    dataset = 'CA06',regions=list(CD="3513"), level = 'DA', 
+    vectors =  c("v_CA06_101", #tenure_total,
+                 "v_CA06_102", #owners,
+                 "v_CA06_103", #renters,
+                 "v_CA06_2053", #ownerpressuretotal,
+                 "v_CA06_2056", #ownerpressure,
+                 "v_CA06_2049", #rentpressuretotal,
+                 "v_CA06_2051", #rentpressure,
+                 "v_CA06_2050", #avggrossrent,
+                 "v_CA06_2055", #avghomecosts,
+                 "v_CA06_2054", #avgdwellingvalue
+                 "v_CA06_1981", #lowincaftertax
+                 "v_CA06_451", #mobilitytotal,
+                 "v_CA06_453", #movers1year
+                 "v_CA06_460", #mobilitytotal5,
+                 "v_CA06_462"), #movers5year
+    geo_format = "sf") %>%
+  st_transform(32618) 
+
+names(DA06) <- c("area","quality_flags","type","dwellings","households","GeoUID","population","CD_UID","CSD_UID","region","area2","total_tenure","owner","renter","rentalpressure_owner_total","rentalpressure_owner","rentalpressure_renter","avghomecosts","avgdwellingvalue","rentalpressure_renter_total","avgrent","lowinc","total_mobility1","movers1year","total_mobility5","movers5year","geometry")
+
+DA06 <-
+  DA06 %>%   
+  mutate(owner = owner/total_tenure,
+         renter = renter/total_tenure,
+         rentalpressure_owner =  rentalpressure_owner/rentalpressure_owner_total,
+         rentalpressure_renter = rentalpressure_renter/rentalpressure_renter_total,
+         movers1year = movers1year/total_mobility1,
+         movers5year = movers5year/total_mobility5) %>% 
+  select(-quality_flags,-type,-CD_UID,-CSD_UID,-region,-area2,-total_tenure,-rentalpressure_owner_total,-rentalpressure_renter_total,-total_mobility1,-total_mobility5)
+
+DA01 <-
+  get_census(
+    dataset = 'CA01',regions=list(CD="3513"), level = 'DA', 
+    vectors =  c("v_CA01_96", #tenure_total,
+                 "v_CA01_99", #owners,
+                 "v_CA01_100", #renters,
+                 "v_CA01_1670",#ownerpressuretotal,
+                 "v_CA01_1672", #ownerpressure,
+                 "v_CA01_1666", #rentpressuretotal
+                 "v_CA01_1668", #rentpressure,
+                 "v_CA01_1667", #avggrossrent,
+                 "v_CA01_1671", #avghomecosts,
+                 "v_CA01_1674", #avgdwellingvalue
+                 "v_CA01_1620", #lowinc
+                 "v_CA01_381", #mobilitytotal,
+                 "v_CA01_383", #movers1year
+                 "v_CA01_390", #mobilitytotal5,
+                 "v_CA01_392"), #movers5year
+    geo_format = "sf") %>%
+  st_transform(32618) 
+
+names(DA01) <- c("area","type","dwellings","households","GeoUID","key","population","CD_UID","CSD_UID","region","area2","total_tenure","owner", 
+                 "renter","rentalpressure_owner_total","rentalpressure_owner","rentalpressure_renter_total", "rentalpressure_renter","avgrent", 
+                 "avghomecosts","avgdwellingvalue","lowinc","total_mobility1","movers1year","total_mobility5","movers5year","geometry")
+
+DA01 <-
+  DA01 %>%   
+  mutate(owner = owner/total_tenure,
+         renter = renter/total_tenure,
+         rentalpressure_owner =  rentalpressure_owner/rentalpressure_owner_total,
+         rentalpressure_renter = rentalpressure_renter/rentalpressure_renter_total,
+         movers1year = movers1year/total_mobility1,
+         movers5year = movers5year/total_mobility5) %>% 
+  select(-type,-CD_UID,-CSD_UID,-key,-region,-area2,-total_tenure,-rentalpressure_owner_total,-rentalpressure_renter_total,-total_mobility1,-total_mobility5)
+
+
+view(list_census_vectors("CA01"))
+view(DA01)
 #propertyfiles
 
 property <-
