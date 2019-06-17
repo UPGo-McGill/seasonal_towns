@@ -87,7 +87,7 @@ DA11 <-
     geo_format = "sf") %>%
   st_transform(32618) 
 
-names(DA11) <- c("area", "quality_flags", "type", "dwellings", "households", "GeoUID", "NHS_nonreturn", "population", "CDUID", "CSD_UID", "Region","area2","NHS_nonreturn2","total_tenure","owner","renter","rentpressure_owner","rentpressure_renter","medianrent","avgrent","medianownership","avgownership","mediandwellingvalue","avgdwellingvalue","lowinc","total_mobility1","movers1year","total_mobility5","movers5year", "usual_residents", "geometry")
+names(DA11) <- c("area", "quality_flags", "type", "dwellings", "households", "GEOUID", "NHS_nonreturn", "population", "CDUID", "CSD_UID", "Region","area2","NHS_nonreturn2","total_tenure","owner","renter","rentpressure_owner","rentpressure_renter","medianrent","avgrent","medianownership","avgownership","mediandwellingvalue","avgdwellingvalue","lowinc","total_mobility1","movers1year","total_mobility5","movers5year", "usual_residents", "geometry")
 
 DA11 <-
   DA11 %>%   

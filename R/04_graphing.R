@@ -85,3 +85,22 @@ st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped,
          filter(Date == year_prior) %>% 
          inner_join(property, .) %>% 
          filter(FREH == TRUE))
+
+
+
+## BAR GRAPH SHOWING UNITS BY CONSTRUCTION YEAR
+sum(DA$constructed_before1961)
+sum(DA$constructed_196180)
+sum(DA$constructed_198190)
+sum(DA$constructed_199100)
+sum(DA$constructed_200105)
+sum(DA$constructed_200610)
+sum(DA$constructed_201116)
+
+## BAR GRAPH SHOWING HOUSEHOLDS BY BEDROOMS
+
+
+
+
+
+        

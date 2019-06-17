@@ -24,8 +24,6 @@ coastal_water <- read_sf("data", "lhy_000h16a_e")
 coastal_water <- st_union(st_combine(coastal_water))
 
 
-
-  
 ## CREATE BASEMAP 
 
 base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
@@ -158,8 +156,19 @@ base_map +
               border.col = "#f0f0f0",
               border.alpha = .2,
               title = "",
-              breaks = c(0,20,40,60,80)) +
-  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent")
+              breaks = c(0,0,20,40,60,80)) +
+  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent, 2016")
+
+panel1 <-   
+  base_map +
+  tm_shape(DA11) +
+  tm_polygons(col = "rentpressure_renter", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,0,20,40,60,80)) +
+  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent 2011")
 
 panel2 <-   
 base_map +
@@ -171,6 +180,10 @@ base_map +
               title = "",
               breaks = c(0,20,40,60,80)) +
   tm_layout(title = "Figure X. Home Ownership Pressure - 30%+ on housing")
+
+
+
+
 
 #figureX <- 
 tmap_arrange(panel1,panel2)
@@ -209,25 +222,12 @@ base_map +
               breaks = c(500,700,900,1100,1300,1500)) +
   tm_layout(title = "Average Monthly Housing Costs, Homeowners")
 
+tmap_arrange(panel3,panel4)
+rm(panel3, panel4)
 
 #figureX <-
-tmap_arrange(panel3,panel4)
 
-
-#figure <- 
-base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "", 
-              palette = "Greens",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "") +
-  tm_layout(title = "Figure X. Rent Increase Over Time, 2000 to 2016")
-
-
-
-
-#figureX <-   
+panel5 <- 
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "movers1year", 
@@ -237,8 +237,7 @@ base_map +
               title = "") +
   tm_layout(title = "Figure X. Moved within past 12 Months")
 
-
-#figureX <-   
+panel6 <-  
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "movers5year", 
@@ -248,7 +247,24 @@ base_map +
               title = "") +
   tm_layout(title = "Figure X. Moved within past 5 years")
 
+tmap_arrange(panel5,panel6)
+rm(panel5,panel6)
 
+#figurex <- 
+  base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "movers1", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Rent Increase Over Time, 2000 to 2016")
+
+  
+
+  
+  
+  
 #figureX <-   
 base_map +
   tm_shape(DA) +
