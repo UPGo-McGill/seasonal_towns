@@ -22,9 +22,8 @@ water <-read_sf("data","lhy_000c16a_e")
 water <- st_union(st_combine(water))
 coastal_water <- read_sf("data", "lhy_000h16a_e")
 coastal_water <- st_union(st_combine(coastal_water))
-z
-  
-  
+
+
 ## CREATE BASEMAP 
 
 base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
@@ -44,34 +43,17 @@ base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold")
 
+
+## CREATE INSET
+
+inset_picton <- viewport(x = 0.87, y = .42, width = 0.3, height = 0.3)
+
 m_picton <- 
-  tm_shape(st_buffer(filter(DA, GEOUID == 35130064 | GEOUID == 5130065| 
-                    GEOUID == 35130063),200)) + 
-  tm_borders(col = "white")+
-  tm_shape(filter(DA, GEOUID == 35130064 | GEOUID == 5130065| 
-                    GEOUID == 35130063 ))+
-  tm_borders(col="grey")+
-  tm_shape(property)+
-  tm_dots(col = "Listing_Type",
-          scale = 4/3, 
-          palette = get_brewer_pal("-Dark2", n = 3), 
-          alpha = 0.6, 
-          size = "revenue", 
-          title.size = "Revenue", 
-          size.lim = c(0, 100000),
-          legend.show = FALSE,
-          legend.size.show = FALSE) +
-  tm_layout(legend.position = c("left", "bottom"),
-            frame = TRUE, legend.bg.alpha = 0.6, legend.bg.color = "white") 
-  
-inset_picton <- viewport(x = 0.9, y = .8, width = 0.4, height = 0.4)
+  tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),100)) + tm_borders(col = "#f0f0f0") +
+  tm_layout(legend.show = F) +
+  tm_shape(DA)+ tm_polygons(col = "lowinc",  palette = "Greens")
 
-figure1
 print(m_picton, vp = inset_picton)
-
-library(grid)
-#create an inset
-
 
 ### MAPPING LISTINGS
 #Map of Listing Type (Entire Home, Private Room or Shared Room) and Revenue
@@ -108,16 +90,207 @@ tm_shape(property, ext = 1.2)+
 
 ### MAPPING CENSUS VARIABLES
 
-#figure2 <- 
-  base_map +
+#figureX <-   
+base_map +
+    tm_shape(DA) +
+    tm_polygons(col = "dwellings_usual_residents", 
+                palette = "Greens",
+                border.col = "#f0f0f0",
+                border.alpha = .2,
+                title = "") +
+    tm_layout(title = "Figure X. Dwellings Occupied by Usual Residents") +
+  print(m_picton, vp = inset_picton)
+
+#figureX <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "pop_dens", 
+              palette = "Purples",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,20,50,100,250,500,1000,2000)) +
+  tm_layout(title = "Figure X. Population Density") 
+
+
+#figureX <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "renter", 
+              palette = "Oranges",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,0.1,0.2,0.4,0.55,0.7)) +
+  tm_layout(title = "Figure X. Renters")
+
+m_picton <- 
+  tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),100)) + tm_borders(col = "#f0f0f0") +
+  tm_layout(legend.show = F, main.title = 'Picton', main.title.size = 0.9) +
+  tm_shape(DA)+ tm_polygons(col = "renter", 
+                            palette = "Oranges",
+                            border.col = "#f0f0f0",
+                            border.alpha = .2,
+                            breaks = c(0,0.1,0.2,0.4,0.55,0.7))
+
+print(m_picton, vp = inset_picton)
+
+
+
+
+#figureX <- 
+base_map +
   tm_shape(DA) +
   tm_polygons(col = "rentpressure_both", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Households Spending More than 30% on Housing")
+
+panel1 <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "rentpressure_renter", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,0,20,40,60,80)) +
+  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent, 2016")
+
+panel1 <-   
+  base_map +
+  tm_shape(DA11) +
+  tm_polygons(col = "rentpressure_renter", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,0,20,40,60,80)) +
+  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent 2011")
+
+panel2 <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "rentpressure_owner", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,20,40,60,80)) +
+  tm_layout(title = "Figure X. Home Ownership Pressure - 30%+ on housing")
+
+
+
+
+
+#figureX <- 
+tmap_arrange(panel1,panel2)
+
+#figurex <- 
+  tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),2000)) + tm_borders(col = "#f0f0f0") +
+  tm_layout(title = "Figure X. Rental Pressure in Picton", legend.bg.color = "white", legend.bg.alpha = 0.5)+
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
+  tm_shape(DA)+ tm_polygons(col = "rentpressure_renter", 
+                            palette = "Blues",
+                            border.col = "#f0f0f0",
+                            border.alpha = .2,
+                            title = "",
+                            breaks = c(0,20,40,60,80))
+  
+
+panel3 <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "avgrent", 
               palette = "Greens",
               border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(500,700,900,1100,1300,1500)) +
+  tm_layout(title = "Average Monthly Rent")
+
+panel4 <- 
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "medianownershipcosts", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(500,700,900,1100,1300,1500)) +
+  tm_layout(title = "Average Monthly Housing Costs, Homeowners")
+
+tmap_arrange(panel3,panel4)
+rm(panel3, panel4)
+
+#figureX <-
+
+panel5 <- 
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "movers1year", 
+              palette = "Purples",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
               title = "") +
-  tm_layout(title = "Figure 1. Housing Pressure - Households Spending More than 30% on Housing, Renters and Homeowners")
-  
-  
+  tm_layout(title = "Figure X. Moved within past 12 Months")
+
+panel6 <-  
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "movers5year", 
+              palette = "Purples",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Moved within past 5 years")
+
+tmap_arrange(panel5,panel6)
+rm(panel5,panel6)
+
+#figurex <- 
+  base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "movers1", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Rent Increase Over Time, 2000 to 2016")
+
   
 
   
+  
+  
+#figureX <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "avgrent", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Average Rent, 2016")
+
+
+#figureX <-   
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "medinc", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Median Income")
+
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "lowinc", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Low Inc")
