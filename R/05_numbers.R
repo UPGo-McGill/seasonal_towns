@@ -43,3 +43,24 @@ counts <- counts %>%
 ## n = number of listing per DA // listperdwell = num of listings per dwellings in DAs
 
 
+
+#### MAPPING CODE -stashed changes
+
+names <- 
+  read_csv("data/names.csv")%>%
+  set_names(c("ID", "Geog_Title", "Term", "Category",
+              "Code", "Latitude", "Longitude", "Location", "Province", "Relevance")) %>% 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+  st_transform(32618)
+
+intersection <- st_intersection(DA, property)
+intersection <- intersection %>% 
+  group_by(GEOUID) %>% 
+  count()
+intersection
+DA <- st_join(DA, intersection)
+DA <- DA%>%
+  mutate(listperdwell = n/dwellings)
+
+
+
