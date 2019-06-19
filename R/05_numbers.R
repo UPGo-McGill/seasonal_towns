@@ -15,7 +15,6 @@ round(daily %>%
         summarize(Listings = n()) %>%
         summarise(mean_Listings = mean(Listings)))
 
-
 ## List by Host ID
 property%>%
   count(Airbnb_HID)%>%
