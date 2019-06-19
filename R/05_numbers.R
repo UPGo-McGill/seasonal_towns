@@ -18,7 +18,7 @@ intersection <- intersection %>%
 
 DA_no_raffle <- st_join(DA, intersection)
 DA_no_raffle <- DA_no_raffle%>%
-  mutate(listperdwell = n/dwellings)
+  mutate(no_raffle_lperd = n/dwellings)
 
 #### RUN NUMBERS #######
 
