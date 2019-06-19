@@ -48,12 +48,12 @@ base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
 
 inset_picton <- viewport(x = 0.87, y = .42, width = 0.3, height = 0.3)
 
-m_picton <- 
+#m_picton <- 
   tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),100)) + tm_borders(col = "#f0f0f0") +
   tm_layout(legend.show = F) +
   tm_shape(DA)+ tm_polygons(col = "lowinc",  palette = "Greens")
 
-print(m_picton, vp = inset_picton)
+#print(m_picton, vp = inset_picton)
 
 ### MAPPING LISTINGS
 #Map of Listing Type (Entire Home, Private Room or Shared Room) and Revenue
@@ -90,18 +90,7 @@ tm_shape(property, ext = 1.2)+
 
 ### MAPPING CENSUS VARIABLES
 
-#figureX <-   
-base_map +
-    tm_shape(DA) +
-    tm_polygons(col = "dwellings_usual_residents", 
-                palette = "Greens",
-                border.col = "#f0f0f0",
-                border.alpha = .2,
-                title = "") +
-    tm_layout(title = "Figure X. Dwellings Occupied by Usual Residents") +
-  print(m_picton, vp = inset_picton)
-
-#figureX <-   
+#POPULATION DENSITY  
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "pop_dens", 
@@ -113,7 +102,7 @@ base_map +
   tm_layout(title = "Figure X. Population Density") 
 
 
-#figureX <-   
+#RENTERS   
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "renter", 
@@ -135,61 +124,72 @@ m_picton <-
 
 print(m_picton, vp = inset_picton)
 
+#HOUSING COSTS
+panel1 <-   
+  base_map +
+  tm_shape(filter(DA, avgrent > 0)) +
+  tm_polygons(col = "avgrent", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(500,700,900,1100,1300,1500)) +
+  tm_layout(title = "Average Monthly Rent")
+
+panel2 <- 
+  base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "avgownershipcosts", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(500,700,900,1100,1300,1500)) +
+  tm_layout(title = "Average Monthly Housing Costs, Homeowners")
+
+tmap_arrange(panel1,panel2)
+rm(panel1, panel2)
 
 
+#RENT PRESSURE - BY TENURE
+panel3 <-   
+base_map +
+  tm_shape(filter(DA, rentpressure_renter > 0)) +
+  tm_polygons(col = "rentpressure_renter", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,20,40,60,80)) +
+  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent, 2016")
 
-#figureX <- 
+panel4 <-   
+base_map +
+  tm_shape(filter(DA, rentpressure_owner > 0)) +
+  tm_polygons(col = "rentpressure_owner", 
+              palette = "Blues",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "",
+              breaks = c(0,10,20,30,40)) +
+  tm_layout(title = "Figure X. Home Ownership Pressure - 30%+ on housing")
+
+tmap_arrange(panel3,panel4)
+rm(panel3,panel4)
+
+
+#RENT PRESSURE - BOTH
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "rentpressure_both", 
               palette = "Blues",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "") +
-  tm_layout(title = "Figure X. Households Spending More than 30% on Housing")
-
-panel1 <-   
-base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "rentpressure_renter", 
-              palette = "Blues",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
               title = "",
-              breaks = c(0,0,20,40,60,80)) +
-  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent, 2016")
+              breaks = c(0,.15,.3,.45,.6)) +
+  tm_layout(title = "Figure X. 30%+ on housing, tenants and owners")
 
-panel1 <-   
-  base_map +
-  tm_shape(DA11) +
-  tm_polygons(col = "rentpressure_renter", 
-              palette = "Blues",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "",
-              breaks = c(0,0,20,40,60,80)) +
-  tm_layout(title = "Figure X. Rental Pressure - 30%+ on rent 2011")
-
-panel2 <-   
-base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "rentpressure_owner", 
-              palette = "Blues",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "",
-              breaks = c(0,20,40,60,80)) +
-  tm_layout(title = "Figure X. Home Ownership Pressure - 30%+ on housing")
-
-
-
-
-
-#figureX <- 
-tmap_arrange(panel1,panel2)
-
-#figurex <- 
-  tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),2000)) + tm_borders(col = "#f0f0f0") +
+tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),2000)) + tm_borders(col = "#f0f0f0") +
   tm_layout(title = "Figure X. Rental Pressure in Picton", legend.bg.color = "white", legend.bg.alpha = 0.5)+
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
   tm_shape(DA)+ tm_polygons(col = "rentpressure_renter", 
@@ -200,32 +200,8 @@ tmap_arrange(panel1,panel2)
                             breaks = c(0,20,40,60,80))
   
 
-panel3 <-   
-base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "avgrent", 
-              palette = "Greens",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "",
-              breaks = c(500,700,900,1100,1300,1500)) +
-  tm_layout(title = "Average Monthly Rent")
 
-panel4 <- 
-base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "medianownershipcosts", 
-              palette = "Greens",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "",
-              breaks = c(500,700,900,1100,1300,1500)) +
-  tm_layout(title = "Average Monthly Housing Costs, Homeowners")
-
-tmap_arrange(panel3,panel4)
-rm(panel3, panel4)
-
-#figureX <-
+#MOBILITY
 
 panel5 <- 
 base_map +
@@ -234,8 +210,10 @@ base_map +
               palette = "Purples",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "") +
+              title = "",
+              breaks = c(0,0.05,0.1,0.2,0.25)) +
   tm_layout(title = "Figure X. Moved within past 12 Months")
+
 
 panel6 <-  
 base_map +
@@ -244,39 +222,14 @@ base_map +
               palette = "Purples",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "") +
+              title = "",
+              breaks = c(0,0.15,0.3,0.45,0.8)) +
   tm_layout(title = "Figure X. Moved within past 5 years")
 
 tmap_arrange(panel5,panel6)
 rm(panel5,panel6)
 
-#figurex <- 
-  base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "movers1", 
-              palette = "Greens",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "") +
-  tm_layout(title = "Figure X. Rent Increase Over Time, 2000 to 2016")
-
-  
-
-  
-  
-  
-#figureX <-   
-base_map +
-  tm_shape(DA) +
-  tm_polygons(col = "avgrent", 
-              palette = "Blues",
-              border.col = "#f0f0f0",
-              border.alpha = .2,
-              title = "") +
-  tm_layout(title = "Figure X. Average Rent, 2016")
-
-
-#figureX <-   
+#INCOME 
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "medinc", 
@@ -286,11 +239,66 @@ base_map +
               title = "") +
   tm_layout(title = "Figure X. Median Income")
 
+#LOW INCOME
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "lowinc", 
               palette = "Greens",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "") +
+              title = "",
+              breaks = c(0,5,10,20,30,40)) +
   tm_layout(title = "Figure X. Low Inc")
+
+
+#USUAL RESIDENTS
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "dwellings_usual_residents", 
+              palette = "-Oranges",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Dwellings Occupied by Usual Residents")
+
+
+
+
+## dwelling value over time
+base_map +
+  tm_shape(DA) +
+  tm_polygons(col = "avgdwellingvalue", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Average Dwelling Value 2016")
+
+base_map +
+  tm_shape(DA11) +
+  tm_polygons(col = "avgdwellingvalue", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Average Dwelling Value 2011")
+
+base_map +
+  tm_shape(DA06) +
+  tm_polygons(col = "avgdwellingvalue", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Average Dwelling Value 2006")
+
+base_map +
+  tm_shape(DA01) +
+  tm_polygons(col = "avgdwellingvalue", 
+              palette = "Greens",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "") +
+  tm_layout(title = "Figure X. Average Dwelling Value 2001")
+
+

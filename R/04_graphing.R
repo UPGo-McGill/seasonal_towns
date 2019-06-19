@@ -26,7 +26,10 @@ host_revenue<-
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
   group_by(Airbnb_HID) %>%
   summarize(rev = sum(Price)) %>%
-  filter(rev > 0) %>%
+  filter(rev > 0) 
+
+
+
   summarize(
     `Top 1%`  = sum(rev[rev > quantile(rev, c(0.99))] / sum(rev)),
     `Top 5%`  = sum(rev[rev > quantile(rev, c(0.95))] / sum(rev)),

@@ -32,7 +32,7 @@ variables_housing = c("v_CA16_4843", "v_CA16_4844", "v_CA16_4845", "v_CA16_4846"
                       "v_CA16_6719", "v_CA16_6725")
 variables_income = c("v_CA16_2207", "v_CA16_2540")
 
-DA16 <-
+DA <-
   get_census(
     dataset = 'CA16',regions=list(CD="3513"), level = 'DA', 
     vectors =  c(variables_pop, variables_housing, variables_income),
@@ -40,7 +40,7 @@ DA16 <-
   st_transform(32618) 
 
 
-names(DA16) <- c("area","type","dwellings1","households1", "GEOUID", "population1",
+names(DA) <- c("area","type","dwellings1","households1", "GEOUID", "population1",
                "CD_UID", "CSD_UID","region","area2", "pop","pop11","pop_change",
                "dwellings","dwellings_usual_residents","pop_dens",
                "total_bedrooms", "bedrooms0","bedrooms1","bedrooms2","bedrooms3","bedrooms4",
@@ -53,8 +53,8 @@ names(DA16) <- c("area","type","dwellings1","households1", "GEOUID", "population
                "avgrent",
                "total_mobility1","movers1year", "total_mobility5", "movers5year",
                "medinc", "lowinc","geometry")
-DA16 <- 
-  DA16 %>% 
+DA <- 
+  DA %>% 
   mutate(dwellings_usual_residents = dwellings_usual_residents/dwellings,
          owner = owner/total_tenure,
               renter = renter/total_tenure,
