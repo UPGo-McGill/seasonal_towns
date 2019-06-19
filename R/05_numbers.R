@@ -1,5 +1,17 @@
+###### RUN RAFFLE ########
+
+prop_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
+
+counts <- prop_raffle%>%
+  count(winner)
+
+counts <- st_join(DA, counts)
+counts <- counts %>%
+  mutate(listingsperdwell = n/dwellings)
+## n = number of listing per DA // listperdwell = num of listings per dwellings in DAs
+
+
 #### RUN NUMBERS #######
-#### AND RAFFLE #######
 
 ## Number of Active Listings last year
 listings2019 <- daily %>% 
@@ -16,8 +28,8 @@ daily %>%
         summarize(Listings = n()) %>%
         summarise(mean_Listings = mean(Listings))
 
-
-## Revenue last year
+## Total revenue
+  ## Revenue over past 12 months
 rev2019 <- daily %>% 
   filter(Date <= Date & 
            Date >= year_prior &
@@ -25,15 +37,14 @@ rev2019 <- daily %>%
   summarise(sum_revenue = sum(Price, na.rm = TRUE) * exchange_rate)%>%
   as.numeric()
 
-## Revenue year prior
+  ## Revenue year prior
 daily %>% 
   filter(Date <= year_prior & 
            Date >= year_prior_prior &
            Status == "R" ) %>%
   summarise(sum_revenue = sum(Price, na.rm = TRUE) * exchange_rate)
 
-## Revenue per host
-
+## Revenue by host
 host_revenue<-
   daily %>%
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
@@ -50,11 +61,9 @@ host_revenue<-
 host_revenue%>%
   mutate(revenue = value * rev2019)
 
-##
-
 ## List by Host ID
 property%>%
-  count(Airbnb_HID)%>%
+  count(Airbnb_HID)
 
 ## Revenue by Host ID
 host_revenue <-
@@ -65,38 +74,61 @@ host_revenue <-
   filter(rev > 0)
 
 
-## RAFFLE
+## Breakdown Listing Type
+  ## Entire homes
+nrow(daily %>% 
+       filter(Date == End_date) %>% 
+       group_by(Property_ID) %>% 
+       filter(Listing_Type == "Entire home/apt"))*100/
+  nrow(daily %>% 
+         filter(Date == End_date))
 
-prop_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
+  ## Private rooms
+nrow(daily %>% 
+       filter(Date == End_date) %>% 
+       group_by(Property_ID) %>% 
+       filter(Listing_Type == "Private room"))*100/
+  nrow(daily %>% 
+         filter(Date == End_date))
 
-counts <- prop_raffle%>%
-  count(winner)
+  ## Shared rooms
+nrow(daily %>% 
+       filter(Date == End_date) %>% 
+       group_by(Property_ID) %>% 
+       filter(Listing_Type == "Shared room"))*100/
+  nrow(daily %>% 
+         filter(Date == End_date))
 
-counts <- st_join(DA, counts)
-counts <- counts %>%
-  mutate(listingsperdwell = n/dwellings)
+## Housing market loss
+  ## Last year
+st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior,
+                            End_date, listing_type = Listing_Type) %>% 
+                   filter(date == End_date) %>% 
+                   group_by(ghost_ID) %>% 
+                   summarize(n = sum(housing_units)) %>% 
+                   ungroup() %>% 
+                   summarize(GH_housing_loss = sum(n))) +
+  nrow(daily %>% 
+         filter(Date == End_date) %>% 
+         inner_join(property, .) %>% 
+         filter(FREH == TRUE))
 
-## n = number of listing per DA // listperdwell = num of listings per dwellings in DAs
+  ## Previous year
+st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior_prior,
+                            year_prior, listing_type = Listing_Type) %>% 
+                   filter(date == year_prior) %>% 
+                   group_by(ghost_ID) %>% 
+                   summarize(n = sum(housing_units)) %>% 
+                   ungroup() %>% 
+                   summarize(GH_housing_loss = sum (n))) +
+  nrow(daily %>% 
+         filter(Date == year_prior) %>% 
+         inner_join(property, .) %>% 
+         filter(FREH == TRUE))
 
-
-
-#### MAPPING CODE -stashed changes
-
-names <- 
-  read_csv("data/names.csv")%>%
-  set_names(c("ID", "Geog_Title", "Term", "Category",
-              "Code", "Latitude", "Longitude", "Location", "Province", "Relevance")) %>% 
-  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
-  st_transform(32618)
-
-intersection <- st_intersection(DA, property)
-intersection <- intersection %>% 
-  group_by(GEOUID) %>% 
-  count()
-intersection
-DA <- st_join(DA, intersection)
-DA <- DA%>%
-  mutate(listperdwell = n/dwellings)
-
+## Reserved nights over last year
+daily %>%
+  filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
+  summarize(Listings = n())
 
 

@@ -10,7 +10,7 @@ year_prior_prior$year <- year_prior$year - 1
 
 ## ACTIVE AIRBNBS OVER TIME
 
-figure2 <- ggplot(daily %>% 
+figure1 <- ggplot(daily %>% 
                     group_by(Date) %>% 
                     summarize(Listings = n())) +
   geom_line(aes(Date, Listings)) +
@@ -26,10 +26,7 @@ host_revenue<-
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
   group_by(Airbnb_HID) %>%
   summarize(rev = sum(Price)) %>%
-  filter(rev > 0) 
-
-
-
+  filter(rev > 0) %>%
   summarize(
     `Top 1%`  = sum(rev[rev > quantile(rev, c(0.99))] / sum(rev)),
     `Top 5%`  = sum(rev[rev > quantile(rev, c(0.95))] / sum(rev)),
@@ -37,7 +34,7 @@ host_revenue<-
   gather(`Top 1%`, `Top 5%`, `Top 10%`, key = "percentile", value = "value") %>% 
   mutate(percentile = factor(percentile, levels = c('Top 1%', 'Top 5%', 'Top 10%')))
 
-figure3 <- 
+figure2 <- 
   ggplot(host_revenue)+
   geom_bar(mapping = aes(x = percentile, y = value, fill = percentile), stat = "identity")+
   theme_minimal()+
@@ -47,48 +44,14 @@ figure3 <-
 
 #ggsave("output/figure3.jpg")
 
-# Revenue over past twelve months and twelve months prior to that
+## REVENUE BY DATE
 
-daily %>% 
-  filter(Date <= End_date & 
-           Date >= year_prior &
-           Status == "R" ) %>%
-  summarise(sum_revenue = sum(Price, na.rm = TRUE) * exchange_rate)
-
-daily %>% 
-  filter(Date <= year_prior 
-         & Date >= year_prior_prior 
-         & Status == "R") %>%
-  summarise(sum_revenue = sum(Price, na.rm = TRUE) * exchange_rate)
-
-
-
-# Housing loss on the end date and a year prior
-
-st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior,
-                            End_date, listing_type = Listing_Type) %>% 
-                   filter(date == End_date) %>% 
-                   group_by(ghost_ID) %>% 
-                   summarize(n = sum(housing_units)) %>% 
-                   ungroup() %>% 
-                   summarize(GH_housing_loss = sum(n))) +
-  nrow(daily %>% 
-         filter(Date == End_date) %>% 
-         inner_join(property, .) %>% 
-         filter(FREH == TRUE)) 
-
-st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior_prior,
-                            year_prior, listing_type = Listing_Type) %>% 
-                   filter(date == year_prior) %>% 
-                   group_by(ghost_ID) %>% 
-                   summarize(n = sum(housing_units)) %>% 
-                   ungroup() %>% 
-                   summarize(GH_housing_loss = sum (n))) +
-  nrow(daily %>% 
-         filter(Date == year_prior) %>% 
-         inner_join(property, .) %>% 
-         filter(FREH == TRUE))
-
+figure3 <- ggplot(daily %>% 
+         filter(Date<="2019-04-30" & Date>="2016-07-01"& Status == "R") %>%
+         group_by(Date)%>%
+         summarise(rev = sum(Price, na.rm = TRUE) * exchange_rate))+
+  geom_line(aes(Date, rev)) +
+  theme_minimal()
 
 
 ## BAR GRAPH SHOWING UNITS BY CONSTRUCTION YEAR

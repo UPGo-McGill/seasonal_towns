@@ -301,4 +301,21 @@ base_map +
               title = "") +
   tm_layout(title = "Figure X. Average Dwelling Value 2001")
 
+###
+## add names to towns
+names <- 
+  read_csv("data/names.csv")%>%
+  set_names(c("ID", "Geog_Title", "Term", "Category",
+              "Code", "Latitude", "Longitude", "Location", "Province", "Relevance")) %>% 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+  st_transform(32618)
+
+intersection <- st_intersection(DA, property)
+intersection <- intersection %>% 
+  group_by(GEOUID) %>% 
+  count()
+intersection
+DA <- st_join(DA, intersection)
+DA <- DA%>%
+  mutate(listperdwell = n/dwellings)
 
