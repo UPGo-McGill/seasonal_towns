@@ -167,10 +167,6 @@ DA01 <-
   select(-type,-CD_UID,-CSD_UID,-key,-region,-area2,-total_tenure,-rentalpressure_owner_total,-rentalpressure_renter_total,-total_mobility1,-total_mobility5)
 
 
-view(list_census_vectors("CA01"))
-view(DA01)
-#propertyfiles
-
 property <-
   read_csv("data/PEC_property.csv", col_types = cols_only(
     `Property_ID` = col_character(),
@@ -306,3 +302,16 @@ property <-
   mutate(GH = if_else(Property_ID %in% GH_list, TRUE, FALSE))
 
 rm(GH_list)
+
+## number of listings per DA
+
+intersection <- st_intersection(DA, property)
+intersection <- intersection %>% 
+  group_by(GEOUID) %>% 
+  count()
+intersection
+DA <- st_join(DA, intersection)
+DA <- DA%>%
+  mutate(listperdwell = n/dwellings)
+
+

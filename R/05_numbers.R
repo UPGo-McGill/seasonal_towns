@@ -131,4 +131,3 @@ daily %>%
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
   summarize(Listings = n())
 
-
