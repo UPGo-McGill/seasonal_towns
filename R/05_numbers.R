@@ -1,15 +1,24 @@
 ###### RUN RAFFLE ########
 
-prop_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
+DA_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
 
-counts <- prop_raffle%>%
-  count(winner)
+DA_raffle <- DA_raffle %>% count(winner)
 
-counts <- st_join(DA, counts)
-counts <- counts %>%
-  mutate(listingsperdwell = n/dwellings)
+DA_raffle <- st_join(DA, DA_raffle)
+DA_raffle <- DA_raffle %>%
+  mutate(raffle_lperd = n/dwellings)
 ## n = number of listing per DA // listperdwell = num of listings per dwellings in DAs
 
+## number of listings per DA - WITHOUT RAFFLE
+
+intersection <- st_intersection(DA, property)
+intersection <- intersection %>% 
+  group_by(GEOUID) %>% 
+  count()
+
+DA_no_raffle <- st_join(DA, intersection)
+DA_no_raffle <- DA_no_raffle%>%
+  mutate(listperdwell = n/dwellings)
 
 #### RUN NUMBERS #######
 
