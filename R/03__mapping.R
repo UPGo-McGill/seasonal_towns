@@ -366,3 +366,47 @@ base_map +
               title = "") +
   tm_layout(title = "Figure X. Average Dwelling Value 2001")
 
+### LISTING PER DA
+# No raffle
+base_map +
+  tm_shape(DA_no_raffle) +
+  tm_polygons(col = "n", 
+              palette = "Reds",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "")+
+  tm_layout(title = "Figure X. Number of Listings per Dissemination Area")
+
+### Listings per DA - with - raffle
+base_map +
+  tm_shape(DA_raffle) +
+  tm_polygons(col = "n", 
+              palette = "Reds",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "")+
+  tm_layout(title = "Figure X. Number of Listings per Dissemination Area")
+
+## Listings per dwelling unit, by DA
+
+base_map +
+  tm_shape(DA_no_raffle) +
+  tm_polygons(col = "no_raffle_lperd", 
+              palette = "Reds",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "")+
+  #breaks = c(0,.15,.3,.45,.6)) +
+  tm_layout(title = "Figure X. Listings per number of dwellings")
+
+## with raffle
+base_map +
+  tm_shape(DA_raffle) +
+  tm_polygons(col = "raffle_lperd", 
+              palette = "Reds",
+              border.col = "#f0f0f0",
+              border.alpha = .2,
+              title = "")+
+  #breaks = c(0,.15,.3,.45,.6)) +
+  tm_layout(title = "Figure X. Listings per number of dwellings")
+
