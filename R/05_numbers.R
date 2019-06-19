@@ -1,3 +1,11 @@
+#### DEFINE YEARS #######
+
+# Set up timeframes
+year_prior <- as.POSIXlt(End_date)
+year_prior$year <- year_prior$year - 1
+year_prior_prior <- as.POSIXlt(year_prior)
+year_prior_prior$year <- year_prior$year - 1
+
 ###### RUN RAFFLE ########
 
 DA_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
