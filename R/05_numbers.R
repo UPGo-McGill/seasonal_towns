@@ -6,6 +6,8 @@ year_prior$year <- year_prior$year - 1
 year_prior_prior <- as.POSIXlt(year_prior)
 year_prior_prior$year <- year_prior$year - 1
 
+exchange_rate <- 1.34
+
 ###### RUN RAFFLE ########
 
 DA_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
