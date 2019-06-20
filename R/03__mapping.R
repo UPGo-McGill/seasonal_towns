@@ -410,3 +410,20 @@ base_map +
   #breaks = c(0,.15,.3,.45,.6)) +
   tm_layout(title = "Figure X. Listings per number of dwellings")
 
+
+base_map +
+  tm_shape(filter(property, Airbnb_HID == 108999347 | Airbnb_HID == 49480845 |
+                    Airbnb_HID == 160599890 | Airbnb_HID == 233942 | Airbnb_HID==62584153)) +
+  tm_dots(col = "Airbnb_HID", 
+               palette = rainbow(5),
+               size = "revenue",
+               alpha = 0.6,
+          style ="fixed",
+          breaks = c(0,250000,50000000, 62584190,109999347), 
+              #border.col = "#f0f0f0",
+              #border.alpha = .2,  
+              title = "")+
+  tm_layout(title = "Figure X. Top-5 highest earning hosts")
+
+
+

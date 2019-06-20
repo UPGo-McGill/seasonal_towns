@@ -88,7 +88,7 @@ tst <- st_join(DA,tst)
 
 base_map +
   tm_shape(tst) +
-  tm_polygons(col = "revenue", 
+  tm_polygons(col = "revperl", 
               palette = "Purples",
               border.col = "#f0f0f0",
               border.alpha = .2,
@@ -96,7 +96,16 @@ base_map +
   tm_shape(DA)+
   tm_borders(col="grey")+
  # breaks = c(0,.15,.3,.45,.6)) +
-  tm_layout(title = "Figure X. Revenue per DA")
+  tm_layout(title = "Figure X. Revenue per number of listings")
 
 
-  sum(int_tst_2$revenue)
+intersection <- st_intersection(DA, property)
+intersection <- intersection %>% 
+  group_by(GEOUID) %>% 
+  count()
+
+tst <- st_join(tst, intersection)
+
+tst <- tst%>%
+  mutate(revperl = revenue/n)
+
