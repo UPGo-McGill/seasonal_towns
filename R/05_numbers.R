@@ -42,7 +42,7 @@ listings2019 <- daily %>%
 
 ## Number of Active Listings year prior
 daily %>% 
-        filter(Date <= year_prior & Date >= year_prior_prior) %>% 
+        filter(Date <="2016-07-01" & Date >= "2017-") %>% 
         group_by(Date) %>% 
         summarize(Listings = n()) %>%
         summarise(mean_Listings = mean(Listings))
@@ -89,9 +89,10 @@ host_revenue <-
   daily %>%
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
   group_by(Airbnb_HID)%>%
-  summarize(rev = sum(Price)) %>%
+#  summarize(rev = sum(Price)) %>%
+  summarise(rev = sum(Price, na.rm = TRUE) * exchange_rate)%>%
   filter(rev > 0)
-
+sum(host_revenue$rev)
 
 ## Breakdown Listing Type
   ## Entire homes
@@ -133,15 +134,15 @@ st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped,
          filter(FREH == TRUE))
 
   ## Previous year
-st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior_prior,
-                            year_prior, listing_type = Listing_Type) %>% 
-                   filter(date == year_prior) %>% 
+st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, "2016-07-01",
+                            "2017-07-01", listing_type = Listing_Type) %>% 
+                   filter(date == "2017-07-01") %>% 
                    group_by(ghost_ID) %>% 
                    summarize(n = sum(housing_units)) %>% 
                    ungroup() %>% 
                    summarize(GH_housing_loss = sum (n))) +
   nrow(daily %>% 
-         filter(Date == year_prior) %>% 
+         filter(Date == "2017-07-01") %>% 
          inner_join(property, .) %>% 
          filter(FREH == TRUE))
 
