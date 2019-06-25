@@ -1,3 +1,28 @@
+### PICTON AND WELLINGTON PROPERTIES
+
+
+## PICTON BOUNDARIES
+#cities <- read_sf(dsn = ".", layer = "lpc_000b16a_e")
+#picton <- cities%>%
+#  filter(str_detect(PCNAME, "Picton"))%>%
+# st_set_crs(102009) %>% 
+#  st_transform(32618)
+
+picton <- DA%>%
+  filter(GEOUID == 35130061|GEOUID ==35130066| GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063)
+picton_buff <- st_buffer(picton, 200)
+
+## WELLINGTON BOUNDARIES
+wellington <- DA%>%
+  filter(GEOUID == 35130055|GEOUID == 35130056)
+wellington_buff <- st_buffer(wellington, 200)
+
+picton_prop <- st_intersection(property, picton_buff)
+wellington_prop <- st_intersection(property, wellington_buff)
+
+
+
+
 ##### Sampling properties for Host Locations #######
 
 prop_sample <- property[c(sample(1:774,100)),]
@@ -95,17 +120,6 @@ base_map +
               title = "")+
   tm_shape(DA)+
   tm_borders(col="grey")+
- # breaks = c(0,.15,.3,.45,.6)) +
+  # breaks = c(0,.15,.3,.45,.6)) +
   tm_layout(title = "Figure X. Revenue per number of listings")
-
-
-intersection <- st_intersection(DA, property)
-intersection <- intersection %>% 
-  group_by(GEOUID) %>% 
-  count()
-
-tst <- st_join(tst, intersection)
-
-tst <- tst%>%
-  mutate(revperl = revenue/n)
 

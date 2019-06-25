@@ -30,6 +30,7 @@ names <-
               "Code", "Latitude", "Longitude", "Location", "Province", "Relevance")) %>% 
   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
   st_transform(32618)
+  
 
 ## CREATE BASEMAP 
 
@@ -57,7 +58,7 @@ base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
 
 inset_picton <- viewport(x = 0.87, y = .42, width = 0.3, height = 0.3)
 
-#m_picton <- 
+m_picton <- 
   tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),100)) + tm_borders(col = "#f0f0f0") +
   tm_layout(legend.show = F) +
   tm_shape(DA)+ tm_polygons(col = "lowinc",  palette = "Greens")
