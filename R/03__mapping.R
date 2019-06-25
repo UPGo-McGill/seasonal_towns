@@ -387,11 +387,10 @@ base_map +
               title = "")+
   tm_layout(title = "Figure X. Number of Listings per Dissemination Area")
 
-## Listings per dwelling unit, by DA
-
+## Listings per dwelling unit, by DA (no raffle)
 base_map +
-  tm_shape(DA_no_raffle) +
-  tm_polygons(col = "no_raffle_lperd", 
+  tm_shape(DA_raffle) +
+  tm_polygons(col = "lperd_no_raffle", 
               palette = "Reds",
               border.col = "#f0f0f0",
               border.alpha = .2,
@@ -402,14 +401,13 @@ base_map +
 ## with raffle
 base_map +
   tm_shape(DA_raffle) +
-  tm_polygons(col = "raffle_lperd", 
+  tm_polygons(col = "lperd_raffle", 
               palette = "Reds",
               border.col = "#f0f0f0",
               border.alpha = .2,
               title = "")+
   #breaks = c(0,.15,.3,.45,.6)) +
   tm_layout(title = "Figure X. Listings per number of dwellings")
-
 
 base_map +
   tm_shape(filter(property, Airbnb_HID == 108999347 | Airbnb_HID == 49480845 |

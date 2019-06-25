@@ -28,13 +28,9 @@ intersection <- intersection %>%
 
 DA_raffle <- inner_join(intersection, DA_raffle)
 DA_raffle <- inner_join(DA, DA_raffle)
-tst <- DA_raffle%>%
+DA_raffle <- DA_raffle%>%
   mutate (lperd_no_raffle = no_raffle_n/dwellings,
           lperd_raffle = raffle_n/dwellings)
-
-tm_shape(tst)+
-  tm_fill(col = "lperd_raffle")
-
 
 #### RUN NUMBERS #######
 
