@@ -9,26 +9,32 @@ year_prior_prior$year <- year_prior$year - 1
 exchange_rate <- 1.34
 
 ###### RUN RAFFLE ########
+run_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
+intersection <- st_intersection(DA, run_raffle)
 
-DA_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
+## Number of listings in DA with raffle
+DA_raffle <- intersection %>% 
+  count(winner)%>%
+  st_drop_geometry()
+DA_raffle <- DA_raffle%>%
+  rename(GEOUID = winner, raffle_n = n)
 
-DA_raffle <- DA_raffle %>% count(winner)
-
-DA_raffle <- st_join(DA, DA_raffle)
-DA_raffle <- DA_raffle %>%
-  mutate(raffle_lperd = n/dwellings)
-## n = number of listing per DA // listperdwell = num of listings per dwellings in DAs
-
-## number of listings per DA - WITHOUT RAFFLE
-
-intersection <- st_intersection(DA, property)
+## number of listings in DA without raffle
 intersection <- intersection %>% 
   group_by(GEOUID) %>% 
-  count()
+  count()%>%
+  st_drop_geometry()%>%
+  rename(no_raffle_n = n)
 
-DA_no_raffle <- st_join(DA, intersection)
-DA_no_raffle <- DA_no_raffle%>%
-  mutate(no_raffle_lperd = n/dwellings)
+DA_raffle <- inner_join(intersection, DA_raffle)
+DA_raffle <- inner_join(DA, DA_raffle)
+tst <- DA_raffle%>%
+  mutate (lperd_no_raffle = no_raffle_n/dwellings,
+          lperd_raffle = raffle_n/dwellings)
+
+tm_shape(tst)+
+  tm_fill(col = "lperd_raffle")
+
 
 #### RUN NUMBERS #######
 
