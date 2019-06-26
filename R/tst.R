@@ -20,7 +20,9 @@ wellington_buff <- st_buffer(wellington, 200)
 picton_prop <- st_intersection(property, picton_buff)
 wellington_prop <- st_intersection(property, wellington_buff)
 
-
+plot(city$geometry)
+plot(picton_prop, add=TRUE)
+plot(wellington_prop, add=TRUE)
 
 
 ##### Sampling properties for Host Locations #######

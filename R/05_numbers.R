@@ -44,7 +44,7 @@ listings2019 <- daily %>%
 
 ## Number of Active Listings year prior
 daily %>% 
-  filter(Date <="2016-07-01" & Date >= "2017-") %>% 
+  filter(Date <=year_prior & Date >= year_prior_prior) %>% 
   group_by(Date) %>% 
   summarize(Listings = n()) %>%
   summarise(mean_Listings = mean(Listings))
@@ -136,8 +136,8 @@ st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped,
          filter(FREH == TRUE))
 
 ## Previous year
-st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, "2016-07-01",
-                            "2017-07-01", listing_type = Listing_Type) %>% 
+st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior-prior,
+                            year_prior, listing_type = Listing_Type) %>% 
                    filter(date == year_prior) %>% 
                    group_by(ghost_ID) %>% 
                    summarize(n = sum(housing_units)) %>% 
