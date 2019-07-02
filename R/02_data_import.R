@@ -303,15 +303,3 @@ property <-
 
 rm(GH_list)
 
-## number of listings per DA
-
-intersection <- st_intersection(DA, property)
-intersection <- intersection %>% 
-  group_by(GEOUID) %>% 
-  count()
-intersection
-DA <- st_join(DA, intersection)
-DA <- DA%>%
-  mutate(listperdwell = n/dwellings)
-
-
