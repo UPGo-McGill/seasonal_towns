@@ -5,7 +5,7 @@ source("R/01_helper_functions.R")
 ###
 
 End_date <- as.Date("2019-04-30")
-Start_date <- as.Date("2018-04-30")
+Start_date <- as.Date("2016-07-01")
 
 citycode = "3513"
 cityname = "Prince Edward County"
