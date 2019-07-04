@@ -35,12 +35,16 @@ DA_raffle <- DA_raffle%>%
 #### RUN NUMBERS #######
 
 ## Number of Active Listings last year
-listings2019 <- daily %>% 
+#listings2019 <- 
+  daily %>% 
   filter(Date <= End_date & Date >= year_prior) %>% 
-  group_by(Date) %>% 
+  group_by(Airbnb_HID)
+  group_by(Airbnb_HID)%>%
   summarize(Listings = n()) %>%
   summarise(mean_Listings = mean(Listings))%>%
   as.numeric()
+daily%>%
+  
 
 ## Number of Active Listings year prior
 daily %>% 
@@ -153,3 +157,14 @@ daily %>%
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
   summarize(Listings = n())
 
+
+## Number of nights reserved per host in last year
+daily %>%
+  filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
+  group_by(Airbnb_HID)%>%
+  summarize(Listings = n())%>%
+  summarise(mean_Listings = mean(Listings))
+
+property%>%
+  count(Airbnb_HID)%>%
+  View()
