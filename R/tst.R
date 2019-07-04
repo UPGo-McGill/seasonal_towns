@@ -125,11 +125,18 @@ base_map +
               palette = "Purples",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "")+
+              title = "Average revenue per listing",
+              legend.format=list(fun=function(lperd_raffle) paste0(formatC(lperd_raffle, digits=0, format="f"), " %")))+
+  tm_legend(position = c("right", "top"),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .25, title.size = 1)+
   tm_shape(DA)+
-  tm_borders(col="grey")+
-  # breaks = c(0,.15,.3,.45,.6)) +
-  tm_layout(title = "Figure X. Revenue per number of listings")
+  tm_borders(col="grey")
+  # breaks = c(0,.15,.3,.45,.6),) 
+ # tm_layout(title = "Figure X. Revenue per number of listings")
+
+
 
 
 
