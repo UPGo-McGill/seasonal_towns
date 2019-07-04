@@ -167,7 +167,7 @@ figure[[8]]<-
 base_map +
   tm_shape(DA) +
   tm_polygons(col = "dwellings_usual_residents", 
-              palette = "-Oranges",
+              palette = "-Reds",
               border.col = "#f0f0f0",
               border.alpha = .2,
               title = "") +
@@ -403,7 +403,7 @@ base_map +
 base_map +
   tm_shape(DA_raffle) +
   tm_polygons(col = "lperd_raffle", 
-              palette = "Reds",
+              palette = "Oranges",
               border.col = "#f0f0f0",
               border.alpha = .2,
               title = "")+
