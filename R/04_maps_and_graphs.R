@@ -494,7 +494,7 @@ figure1 <- ggplot(daily %>%
                     summarise(rev = sum(Price, na.rm = TRUE) * exchange_rate))+
   geom_line(aes(Date, rev)) +
   scale_y_continuous(labels=scales::dollar)+
- labs(y= " ", x = " ") 
+ labs(y= " ", x = " ")+
   theme_minimal()
 
 ggsave("output/figure1.jpg")
