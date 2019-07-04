@@ -161,7 +161,7 @@ daily %>%
 ## Number of nights reserved per host in last year
 daily %>%
   filter(Date >= year_prior, Date <= End_date, Status == "R") %>%
-  group_by(Airbnb_HID)%>%
+  group_by(Airbnb_PID)%>%
   summarize(Listings = n())%>%
   summarise(mean_Listings = mean(Listings))
 
