@@ -332,11 +332,29 @@ property_whistler <- property_whistler%>%
 #regions <- factor(c("Banff","Mont Tremblant","Blue Mountains","Whistler", "PEC"))
 #props <- data.frame(regions= regions)
 
-
-  ## Analysis: number of listings per host
+  ## filter out homeaway listings
+  property_tofino%>%
+    filter(str_detect(Property_ID, "ab"))
   
+  ## Analysis: number of listings per host
   property_tofino%>%
   count(Airbnb_HID)%>%
   View()
   
+  ## total number of listings scraped 2019 onwards
+ total <-  property_tofino%>%
+    filter(str_detect(Property_ID, "ab"))%>%
+    filter(Scraped>=2019-01-01)%>%
+     count(Property_ID)
 
+  total <- sum(total$n)
+ 
+ 
+  ## housing breakdown - Listing_Type
+property_tofino%>%
+    st_drop_geometry()%>%
+    filter(str_detect(Property_ID, "ab"))%>%
+    filter(Scraped>=2019-01-01)%>%
+    count(Listing_Type)%>%
+    mutate(prop = n/total)
+  
