@@ -9,17 +9,6 @@ canada <-
     geo_format = "sf") %>% 
   st_transform(32618)
 
-nunavut <- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(PR = "62"),  
-    level = "CD",
-    geo_format = "sf") %>% 
-  st_transform(32618)
-
-plot(nunavut$geometry)
-plot(canada$geometry)
-
 
 property_blue_mountains <-
   read_csv("data/blue_mountains_property.csv", col_types = cols_only(
@@ -253,8 +242,7 @@ property_pec <- property_pec%>%
 property_whistler <- property_whistler%>%
   mutate(region="Whistler")
 
-tm_shape(canada)+
-  tm_lines(col="black")+
+
   tm_shape(property_banff)+
   tm_dots(col="blue")+
   tm_shape(property_blue_mountains)+
@@ -291,3 +279,16 @@ active2019 <- numeric(5)
 active2019[1] <- 
 props <- props%>%
   data.frame()
+
+
+tst <- property_mont_tremblant%>%
+  count(Airbnb_HID)%>%
+  View()
+  
+tst%>%
+  filter(n>=10)
+View()
+max(tst$n)
+
+tst%>%
+  filter(n==36)

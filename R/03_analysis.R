@@ -14,6 +14,7 @@ intersection <- st_intersection(DA, run_raffle)
 
 ## Number of listings in DA with raffle
 DA_raffle <- intersection %>% 
+  filter(FREH == TRUE)%>%
   count(winner)%>%
   st_drop_geometry()
 DA_raffle <- DA_raffle%>%
@@ -29,8 +30,8 @@ intersection <- intersection %>%
 DA_raffle <- inner_join(intersection, DA_raffle)
 DA_raffle <- inner_join(DA, DA_raffle)
 DA_raffle <- DA_raffle%>%
-  mutate (lperd_no_raffle = no_raffle_n/dwellings,
-          lperd_raffle = raffle_n/dwellings)
+  mutate (lperd_no_raffle = no_raffle_n/dwellings*100,
+          lperd_raffle = raffle_n/dwellings*100)
 
 #### RUN NUMBERS #######
 

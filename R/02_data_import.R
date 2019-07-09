@@ -60,9 +60,14 @@ DA <-
               renter = renter/total_tenure,
               rentpressure_both = rentpressure_both/total_rentpressure,
               movers1year = movers1year/total_mobility1,
-              movers5year = movers5year/total_mobility5) %>% 
+              movers5year = movers5year/total_mobility5,
+         prop_usual_residents = dweelings_usual_residents*100, 
+         prop_renters=renter*100,
+         prop_pressure=rentpressure_both*100) %>% 
   select(-type,-dwellings1,-households1,-population1,-region,-area2,-total_tenure,-total_rentpressure,-total_mobility1,-total_mobility5)
 
+DA <- DA%>%
+  mutate(prop_pressure=rentpressure_both*100)
 
 DA11 <-
   get_census(
