@@ -10,10 +10,16 @@ Start_date <- as.Date("2016-07-01")
 citycode = "3513"
 cityname = "Prince Edward County"
 
+#CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
+#CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
+
+#CSD_Codes%>%
+#  filter(str_detect(name, "Tofino"))
+
 city <- 
   get_census(
     dataset = "CA16", 
-    regions = list(CMA = citycode),  
+    regions = list(CSD = citycode),  
     level = "CMA",
     geo_format = "sf") %>% 
   st_transform(32618)

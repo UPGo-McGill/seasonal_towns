@@ -558,3 +558,38 @@ property_pec%>%
   filter(Scraped>=2019-01-01)%>%
   count(Listing_Type)%>%
   mutate(prop = n/total)
+
+
+
+####
+ # tm_shape(filter(property_tofino, ext = 1.2)+
+#  tm_dots(scale = 0)+
+  #  tm_shape(streets)+
+  #  tm_lines(col="grey", alpha = 0.5)+
+ tm_shape(city_tofino) +
+  tm_borders(lwd = 1) + 
+#  tm_shape(DA)+
+#  tm_borders(col="grey")+
+  tm_shape(property_tofino)+
+  tm_dots(col = "Listing_Type",
+          scale = 4/3, 
+          palette = get_brewer_pal("-Dark2", n = 3), 
+          alpha = 0.6,
+      #    size = "revenue", 
+      #    title.size = "Revenue", 
+      #    size.lim = c(0, 100000),
+          legend.show = FALSE)+
+      #    legend.size.show = TRUE) +
+  tm_layout(legend.position = c("right", "bottom"),
+            frame = FALSE, legend.bg.alpha = 0.6, legend.bg.color = "white") +
+  tm_add_legend(type="symbol",
+                col= get_brewer_pal("-Dark2", n = 3),
+                labels=c("Entire Home", "Private Room", "Shared Room"),
+                border.lwd = NA,
+                alpha = 1,
+                title="Listing Type")+
+  tm_compass()
+
+ 
+ filter(property_tofino, Listing_Type=="Shared room")
+ 
