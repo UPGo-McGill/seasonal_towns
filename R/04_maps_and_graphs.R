@@ -153,7 +153,7 @@ figure[[5]] <-
               palette = "Oranges",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "Proportion of listings per dwellings",
+              title = "Proportion of FREH per dwellings",
               legend.format=list(fun=function(lperd_raffle) paste0(formatC(lperd_raffle, digits=0, format="f"), " %")))+
     tm_legend(position = c("right", "top"),
               bg.color = "white",
