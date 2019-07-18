@@ -25,20 +25,22 @@ water <- st_union(st_combine(water))
 coastal_water <- read_sf("data", "lhy_000h16a_e")
 coastal_water <- st_union(st_combine(coastal_water))
 
+
 ## CREATE BASEMAP 
 
 figure <- list()
 
-base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
-                                ylim=c(0.01, 1.05), relative = TRUE),
-                                unit = "km") +
+base_map <- 
+  tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.3, 2.02),
+                         ylim=c(-0.05, 1.05), relative = TRUE),
+           unit = "km") +
   tm_fill(col = "#f0f0f0") +
-#  tm_shape(streets)+
-#  tm_lines(col = "grey60") +
-#  tm_shape(coastal_water)+
-#  tm_fill(col = "black") + 
-#  tm_shape(water)+
-#  tm_fill(col = "black") +
+  #  tm_shape(streets)+
+  #  tm_lines(col = "grey60") +
+  #  tm_shape(coastal_water)+
+  #  tm_fill(col = "black") + 
+  #  tm_shape(water)+
+  #  tm_fill(col = "black") +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
   tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
             legend.title.fontfamily = "Futura-CondensedExtraBold",
@@ -46,22 +48,21 @@ base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold")
 
-
 ## CREATE INSET
 
-inset_picton <- viewport(x = 0.87, y = .42, width = 0.3, height = 0.3)
+#inset_picton <- viewport(x = 0.87, y = .42, width = 0.3, height = 0.3)
 
-m_picton <- 
-  tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),100)) + tm_borders(col = "#f0f0f0") +
-  tm_layout(legend.show = F) +
-  tm_shape(DA)+ tm_polygons(col = "lowinc",  palette = "Greens")
-  print(m_picton, vp = inset_picton)
+#m_picton <- 
+#  tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 35130063),100)) + tm_borders(col = "#f0f0f0") +
+#  tm_layout(legend.show = F) +
+#  tm_shape(DA)+ tm_polygons(col = "lowinc",  palette = "Greens")
+#print(m_picton, vp = inset_picton)
 
 ######################  FIGURE CREATION ###########################33
 #FIGURE 1. POPULATION DENSITY
 
 figure[[1]] <-  
- base_map +
+  base_map +
   tm_shape(DA) +
   tm_polygons(col = "pop_dens", 
               palette = "Purples",
@@ -75,7 +76,8 @@ tmap_save(figure[[1]], "output/figure_1.png", width = 2400, height = 1500)
 
 #FIGURE 2. AIRBNBS BY LISTING TYPE AND REVENUE
 figure[[2]] <- 
-tm_shape(property, ext = 1.2)+
+  base_map+
+  tm_shape(property, ext = 1.2)+
   tm_dots(scale = 0)+
   #  tm_shape(streets)+
   #  tm_lines(col="grey", alpha = 0.5)+
@@ -93,7 +95,7 @@ tm_shape(property, ext = 1.2)+
           size.lim = c(0, 100000),
           legend.show = FALSE,
           legend.size.show = TRUE) +
-  tm_layout(legend.position = c("left", "bottom"),
+  tm_layout(legend.position = c(0.63, 0.4),
             frame = FALSE, legend.bg.alpha = 0.6, legend.bg.color = "white") +
   tm_add_legend(type="symbol",
                 col= get_brewer_pal("-Dark2", n = 3),
@@ -108,8 +110,8 @@ tmap_save(figure[[2]], "output/figure_2.png", width = 2400, height = 1500)
 #FIGURE 3. LISTINGS PER MONTH
 figure[[3]]<-
   ggplot(daily %>% 
-         group_by(Date) %>% 
-         summarize(Listings = n())) +
+           group_by(Date) %>% 
+           summarize(Listings = n())) +
   geom_line(aes(Date, Listings)) +
   labs(y= " ", x = " ")+
   theme_minimal()
@@ -136,25 +138,29 @@ base_map +
               border.col = "#f0f0f0",
               border.alpha = .2,
               title = "")
-  #tm_layout(title = "Figure X. Number of Listings per Dissemination Area")
+#tm_layout(title = "Figure X. Number of Listings per Dissemination Area")
 
 #FIGURE 5. LISTINGS PER DWELLING
-figure[[5]] <-
+#figure[[5]] <-
   base_map +
   tm_shape(DA_raffle) +
   tm_polygons(col = "lperd_raffle", 
               palette = "Oranges",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "Proportion of FREH per dwellings",
+              title = "Proportion of FREH \nper dwellings",
               legend.format=list(fun=function(lperd_raffle) paste0(formatC(lperd_raffle, digits=0, format="f"), " %")))+
-    tm_legend(position = c("right", "top"),
-              bg.color = "white",
-              bg.alpha=.2,
-              width = .25, title.size = 1)
-            
-  #breaks = c(0,.15,.3,.45,.6)) 
- # tm_layout(title = "Figure X. Listings per number of dwellings")
+  tm_legend(position = c("right", 0.67),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .4, height = 1, title.size = 1)+
+    tm_compass(position = c("right", 0.12))
+
+  
+  ?tm_compass
+?legend.format
+#breaks = c(0,.15,.3,.45,.6)) 
+# tm_layout(title = "Figure X. Listings per number of dwellings")
 
 tmap_save(figure[[5]], "output/figure_5.png", width = 2400, height = 1500)
 
@@ -172,9 +178,9 @@ base_map +
 #FIGURE 6. REVENUE OVER TIME
 exchange_rate = 1.34
 figure[[6]] <- ggplot(daily %>% 
-                    filter(Date<="2019-04-30" & Date>="2016-07-01"& Status == "R") %>%
-                    group_by(Date)%>%
-                    summarise(rev = sum(Price, na.rm = TRUE) * exchange_rate))+
+                        filter(Date<="2019-04-30" & Date>="2016-07-01"& Status == "R") %>%
+                        group_by(Date)%>%
+                        summarise(rev = sum(Price, na.rm = TRUE) * exchange_rate))+
   geom_line(aes(Date, rev)) +
   theme_minimal()
 
@@ -206,14 +212,14 @@ ggsave("output/figure7.jpg")
 
 #FIGURE 8. DWELLINGS OCCUPIED BY USUAL RESIDENT
 figure[[8]]<-
-base_map +
+  base_map +
   tm_shape(DA) +
   tm_polygons(col = "prop_usual_residents", 
               palette = "-Reds",
               border.col = "#f0f0f0",
               border.alpha = .2,
-  title = "Proportion of usual residents",
-legend.format=list(fun=function(lperd_raffle) paste0(formatC(lperd_raffle, digits=0, format="f"), " %")))+
+              title = "Proportion of usual residents",
+              legend.format=list(fun=function(lperd_raffle) paste0(formatC(lperd_raffle, digits=0, format="f"), " %")))+
   tm_legend(position = c("right", "top"),
             bg.color = "white",
             bg.alpha=.2,
@@ -245,7 +251,7 @@ tmap_save(figure[[9]], "output/figure_9.png", width = 2400, height = 1500)
 
 #FIGURE 10. RENTERS
 figure[[10]] <-
-base_map +
+  base_map +
   tm_shape(DA) +
   tm_polygons(col = "prop_renter", 
               palette = "Oranges",
@@ -253,7 +259,7 @@ base_map +
               border.alpha = .2,
               breaks = c(0,15,30,45,60,75),
               title="Proportion of Renters",
-            legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
+              legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
   tm_legend(position = c("right", "top"),
             bg.color = "white",
             bg.alpha=.2,
@@ -314,14 +320,14 @@ figure[[12]]<- base_map +
             bg.color = "white",
             bg.alpha=.2,
             width = .25, title.size = 1)
-              
-  #tm_layout(title = "Figure X. Households spending 30%+ of income on housing, tenants and owners")
+
+#tm_layout(title = "Figure X. Households spending 30%+ of income on housing, tenants and owners")
 
 tmap_save(figure[[12]], "output/figure_12.png", width = 2400, height = 1500)
 
 #FIGURE 13. HOUSING STRESS, RENTERS
 figure[[13]]<-
-base_map +
+  base_map +
   tm_shape(filter(DA, rentpressure_renter > 0)) +
   tm_polygons(col = "rentpressure_renter", 
               palette = "Blues",
@@ -342,11 +348,11 @@ tm_shape(st_buffer(filter(DA, GEOUID == 35130064|GEOUID == 5130065|GEOUID == 351
                             border.alpha = .2,
                             title = "",
                             breaks = c(0,20,40,60,80))
-  
+
 ## FIGURE 14
 
 figure[[14]] <- 
-base_map +
+  base_map +
   tm_shape(tst1) +
   tm_polygons(col = "revperl", 
               palette = "Purples",
@@ -372,7 +378,7 @@ tmap_save(figure[[14]], "output/figure_14.png", width = 2400, height = 1500)
 
 #MOBILITY
 panel5 <- 
-base_map +
+  base_map +
   tm_shape(DA) +
   tm_polygons(col = "movers1year", 
               palette = "Purples",
@@ -383,7 +389,7 @@ base_map +
   tm_layout(title = "Figure X. Moved within past 12 Months")
 
 panel6 <-  
-base_map +
+  base_map +
   tm_shape(DA) +
   tm_polygons(col = "movers5year", 
               palette = "Purples",
@@ -487,7 +493,7 @@ figure1 <- ggplot(daily %>%
                     summarise(rev = sum(Price, na.rm = TRUE) * exchange_rate))+
   geom_line(aes(Date, rev)) +
   scale_y_continuous(labels=scales::dollar)+
- labs(y= " ", x = " ")+
+  labs(y= " ", x = " ")+
   theme_minimal()
 
 ggsave("output/figure1.jpg")
