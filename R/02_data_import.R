@@ -7,14 +7,13 @@ source("R/01_helper_functions.R")
 End_date <- as.Date("2019-04-30")
 Start_date <- as.Date("2016-07-01")
 
-citycode = "3513"
-cityname = "Prince Edward County"
+citycode = "2478102"
 
 #CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
 #CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
 
 #CSD_Codes%>%
-#  filter(str_detect(name, "Tofino"))
+#  filter(str_detect(name, "Tremblant"))
 
 city <- 
   get_census(
@@ -40,7 +39,7 @@ variables_income = c("v_CA16_2207", "v_CA16_2540")
 
 DA <-
   get_census(
-    dataset = 'CA16',regions=list(CD="3513"), level = 'DA', 
+    dataset = 'CA16',regions=list(CSD=citycode), level = 'DA', 
     vectors =  c(variables_pop, variables_housing, variables_income),
     geo_format = "sf") %>%
   st_transform(32618) 
@@ -67,7 +66,7 @@ DA <-
               rentpressure_both = rentpressure_both/total_rentpressure,
               movers1year = movers1year/total_mobility1,
               movers5year = movers5year/total_mobility5,
-         prop_usual_residents = dweelings_usual_residents*100, 
+         prop_usual_residents = dwellings_usual_residents*100, 
          prop_renters=renter*100,
          prop_pressure=rentpressure_both*100) %>% 
   select(-type,-dwellings1,-households1,-population1,-region,-area2,-total_tenure,-total_rentpressure,-total_mobility1,-total_mobility5)
@@ -77,7 +76,7 @@ DA <- DA%>%
 
 DA11 <-
   get_census(
-    dataset = 'CA11',regions=list(CD="3513"), level = 'DA', 
+    dataset = 'CA11',regions=list(CSD=citycode), level = 'DA', 
     vectors =  c("v_CA11N_2252", #tenure_total,
                  "v_CA11N_2253", #owners,
                  "v_CA11N_2254", #renters,
@@ -111,7 +110,7 @@ DA11 <-
 
 DA06 <-
   get_census(
-    dataset = 'CA06',regions=list(CD="3513"), level = 'DA', 
+    dataset = 'CA06',regions=list(CSD=citycode), level = 'DA', 
     vectors =  c("v_CA06_101", #tenure_total,
                  "v_CA06_102", #owners,
                  "v_CA06_103", #renters,
@@ -144,7 +143,7 @@ DA06 <-
 
 DA01 <-
   get_census(
-    dataset = 'CA01',regions=list(CD="3513"), level = 'DA', 
+    dataset = 'CA01',regions=list(CSD=citycode), level = 'DA', 
     vectors =  c("v_CA01_96", #tenure_total,
                  "v_CA01_99", #owners,
                  "v_CA01_100", #renters,
@@ -176,6 +175,16 @@ DA01 <-
          movers1year = movers1year/total_mobility1,
          movers5year = movers5year/total_mobility5) %>% 
   select(-type,-CD_UID,-CSD_UID,-key,-region,-area2,-total_tenure,-rentalpressure_owner_total,-rentalpressure_renter_total,-total_mobility1,-total_mobility5)
+
+## DATA IMPORT FROM Rdata FILE
+
+#load("data/MT_property.Rdata", .GlobalEnv)
+#load("data/MT_daily.Rdata", .GlobalEnv)
+#daily <- MT_daily
+#property <- MT_property
+#remove(MT_daily,MT_property)
+#property <- property%>%
+#  st_transform(32618) 
 
 
 property <-
@@ -290,6 +299,13 @@ property <-
 
 
 ## Find multi-listings
+
+## FOR Rdata FILE
+#daily <- daily%>%
+#drop_na(Listing_Type)
+#daily <- daily%>%
+#mutate(Listing_Type = as.character(daily$Listing_Type))
+
 
 daily <- strr_multilistings(daily, listing_type = Listing_Type,
                             host_ID = Airbnb_HID, date = Date)
