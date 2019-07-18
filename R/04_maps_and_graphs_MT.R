@@ -141,7 +141,7 @@ base_map +
 #tm_layout(title = "Figure X. Number of Listings per Dissemination Area")
 
 #FIGURE 5. LISTINGS PER DWELLING
-#figure[[5]] <-
+figure[[5]] <-
   base_map +
   tm_shape(DA_raffle) +
   tm_polygons(col = "lperd_raffle", 
@@ -156,9 +156,7 @@ base_map +
             width = .4, height = 1, title.size = 1)+
     tm_compass(position = c("right", 0.12))
 
-  
-  ?tm_compass
-?legend.format
+
 #breaks = c(0,.15,.3,.45,.6)) 
 # tm_layout(title = "Figure X. Listings per number of dwellings")
 
