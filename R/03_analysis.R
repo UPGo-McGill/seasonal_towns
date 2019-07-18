@@ -37,15 +37,11 @@ DA_raffle <- DA_raffle%>%
 
 ## Number of Active Listings last year
 #listings2019 <- 
-  daily %>% 
-  filter(Date <= End_date & Date >= year_prior) %>% 
-  group_by(Airbnb_HID)
-  group_by(Airbnb_HID)%>%
+daily %>% 
+  filter(Date <=End_date & Date >= year_prior) %>% 
+  group_by(Date) %>% 
   summarize(Listings = n()) %>%
-  summarise(mean_Listings = mean(Listings))%>%
-  as.numeric()
-daily%>%
-  
+  summarise(mean_Listings = mean(Listings))
 
 ## Number of Active Listings year prior
 daily %>% 
@@ -56,7 +52,8 @@ daily %>%
 
 ## Total revenue
 ## Revenue over past 12 months
-rev2019 <- daily %>% 
+rev2019 <- 
+daily %>% 
   filter(Date <= Date & 
            Date >= year_prior &
            Status == "R" ) %>%
@@ -141,7 +138,7 @@ st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped,
          filter(FREH == TRUE))
 
 ## Previous year
-st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior-prior,
+st_drop_geometry(strr_ghost(property, Property_ID, Airbnb_HID, Created, Scraped, year_prior_prior,
                             year_prior, listing_type = Listing_Type) %>% 
                    filter(date == year_prior) %>% 
                    group_by(ghost_ID) %>% 
@@ -165,7 +162,3 @@ daily %>%
   group_by(Airbnb_PID)%>%
   summarize(Listings = n())%>%
   summarise(mean_Listings = mean(Listings))
-
-property%>%
-  count(Airbnb_HID)%>%
-  View()

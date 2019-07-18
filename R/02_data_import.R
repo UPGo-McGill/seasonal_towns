@@ -301,10 +301,12 @@ property <-
 ## Find multi-listings
 
 ## FOR Rdata FILE
-#daily <- daily%>%
-#drop_na(Listing_Type)
-#daily <- daily%>%
-#mutate(Listing_Type = as.character(daily$Listing_Type))
+# daily <- daily%>%
+# drop_na(Listing_Type)
+# daily <- daily%>%
+#   mutate(Listing_Type = as.character(daily$Listing_Type))
+# property <- property%>%
+#   mutate(Listing_Type = as.character(property$Listing_Type))
 
 
 daily <- strr_multilistings(daily, listing_type = Listing_Type,
