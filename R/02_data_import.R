@@ -186,7 +186,6 @@ DA01 <-
 #property <- property%>%
 #  st_transform(32618) 
 
-
 property <-
   read_csv("data/PEC_property.csv", col_types = cols_only(
     `Property_ID` = col_character(),

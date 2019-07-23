@@ -1,4 +1,10 @@
-#### DEFINE YEARS #######
+##################################### ANALYSIS ########################################
+
+source("R/01_helper_functions.R")
+source("R/00_strr_raffle.R")
+source("R/02_data_import.R")
+
+######### DEFINE YEARS #######
 
 # Set up timeframes
 year_prior <- as.POSIXlt(End_date)

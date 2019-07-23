@@ -1,5 +1,7 @@
 ##################### MAPPING ##########################################
 
+########## for Mont-Tremblant: different map proportions ##############
+
 source("R/01_helper_functions.R")
 
 cityname <- "Mont-Tremblant"
