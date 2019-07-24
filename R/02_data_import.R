@@ -9,19 +9,119 @@ Start_date <- as.Date("2016-07-01")
 
 citycode = "2478102"
 
+PR_Codes <- filter(list_census_regions(dataset = "CA11"), level == "PR") 
+
 #CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
 #CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
 
 #CSD_Codes%>%
 #  filter(str_detect(name, "Tremblant"))
 
-city <- 
+c1 <- 
   get_census(
-    dataset = "CA16", 
-    regions = list(CSD = citycode),  
-    level = "CMA",
+    dataset = "CA11", 
+    regions = list(PR = "35"),  
+    level = "CSD",
     geo_format = "sf") %>% 
   st_transform(32618)
+
+c2 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "24"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c3 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "59"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c4 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "48"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c5 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "46"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c6 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "47"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c7 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "12"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c8 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "13"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c9 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "10"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c10 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "11"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c11 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "61"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c12 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "60"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+c13 <- 
+  get_census(
+    dataset = "CA11", 
+    regions = list(PR = "62"),  
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(32618)
+
+canada <- rbind(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13)
 
 variables_pop = c("v_CA16_401", "v_CA16_402","v_CA16_403","v_CA16_404","v_CA16_405","v_CA16_406")
 variables_pop_names = 

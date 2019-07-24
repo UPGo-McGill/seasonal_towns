@@ -71,6 +71,14 @@ df <- rbind(ca_561510,ca_561520, ca_561590, ca_713990, ca_721111, ca_721113,
             ca_721114, ca_721120, ca_721191, ca_721192, ca_721198)
 result <- df %>% group_by(PROV_CSD) %>% summarise(Count = sum(Total))
 
+library(stringr)
+
+result%>%
+  filter(str_detect(PROV_CSD, "-"))%>%
+  separate(PROV_CSD, c("CSD", "name"), " - ")
+
+  
+
 
 colnames(workforce)[colnames(workforce)=="GEO_CODE (POR)"] <- "GEO_CODE"
 
