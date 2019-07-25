@@ -14,6 +14,8 @@ library(shinyjs)
 library(rmarkdown)
 library(tinytex)
 library(grid)
+library(stringr)
+
 
 
 ## Census Mapper - Run Personal API

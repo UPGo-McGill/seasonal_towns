@@ -5,10 +5,9 @@ source("R/01_helper_functions.R")
 ######### DEFINE YEARS #######
 
 
-PR_Codes <- filter(list_census_regions(dataset = "CA16"), level == "PR")
-
-CSD_Codes%>%
-  filter(str_detect(region, "1001517"))
+#CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA")
+#CMA_Codes%>%
+#  filter(str_detect(name, "Calgary"))
 
 ### Select by city name
 property_mt <- property%>%
@@ -25,7 +24,7 @@ quebec<-
     regions = list(PR = "24"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 bc <- 
   get_census(
@@ -33,7 +32,7 @@ bc <-
     regions = list(PR = "59"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 ontario <- 
   get_census(
@@ -41,7 +40,7 @@ ontario <-
     regions = list(PR = "35"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 ## City census and centroid
 mont_tremblant<- 
@@ -50,7 +49,7 @@ mont_tremblant<-
     regions = list(CSD = "2478102"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 mont_tremblant_c <-  st_centroid(mont_tremblant)
 
@@ -60,7 +59,7 @@ pec<-
     regions = list(CSD = "3513020"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 pec_c <-  st_centroid(prince_edward)
 
@@ -70,7 +69,7 @@ blue_mountains<-
     regions = list(CSD = "3542045"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 blue_mountains_c <-  st_centroid(blue_mountains)
 
@@ -80,7 +79,7 @@ whistler<-
     regions = list(CSD = "5931020"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 whistler_c <-  st_centroid(whistler)
 
@@ -90,7 +89,7 @@ tofino<-
     regions = list(CSD = "5923025"),
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 tofino_c <-  st_centroid(tofino)
 
@@ -101,7 +100,7 @@ toronto<-
     regions = list(CMA = "35535"),  
     level = "CMA",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 toronto_c <-  st_centroid(toronto)
 ### Toronto radius
@@ -120,15 +119,15 @@ plot(pec_intersect$geometry, add=TRUE)
 
 
 ##
-mtl<- 
+montreal<- 
   get_census(
     dataset = "CA16", 
     regions = list(CMA = "24462"),  
     level = "CMA",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
-mtl_c <-  st_centroid(mtl)
+montreal_c <-  st_centroid(mtl)
 ### Find all municipalities within radius of mtl 
 dist_mtl <- as.numeric(st_distance(mtl_c,mont_tremblant_c))
 ##add a buffer"
@@ -152,7 +151,7 @@ vancouver<-
     regions = list(CMA = "59933"),  
     level = "CMA",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 vancouver_c <-  st_centroid(vancouver)
 dist_vancouver <- as.numeric(st_distance(vancouver_c,whistler_c))
@@ -174,7 +173,7 @@ victoria<-
     regions = list(CMA = "59935"),  
     level = "CMA",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 victoria_c <-  st_centroid(victoria)
 dist_victoria <- as.numeric(st_distance(victoria_c,tofino_c))

@@ -23,7 +23,7 @@ c1 <-
     regions = list(PR = "35"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c2 <- 
   get_census(
@@ -31,7 +31,7 @@ c2 <-
     regions = list(PR = "24"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c3 <- 
   get_census(
@@ -39,7 +39,7 @@ c3 <-
     regions = list(PR = "59"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c4 <- 
   get_census(
@@ -47,7 +47,7 @@ c4 <-
     regions = list(PR = "48"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c5 <- 
   get_census(
@@ -55,7 +55,7 @@ c5 <-
     regions = list(PR = "46"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c6 <- 
   get_census(
@@ -63,7 +63,7 @@ c6 <-
     regions = list(PR = "47"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c7 <- 
   get_census(
@@ -71,7 +71,7 @@ c7 <-
     regions = list(PR = "12"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c8 <- 
   get_census(
@@ -79,7 +79,7 @@ c8 <-
     regions = list(PR = "13"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c9 <- 
   get_census(
@@ -87,7 +87,7 @@ c9 <-
     regions = list(PR = "10"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c10 <- 
   get_census(
@@ -95,7 +95,7 @@ c10 <-
     regions = list(PR = "11"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c11 <- 
   get_census(
@@ -103,7 +103,7 @@ c11 <-
     regions = list(PR = "61"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c12 <- 
   get_census(
@@ -111,7 +111,7 @@ c12 <-
     regions = list(PR = "60"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 
 c13 <- 
   get_census(
@@ -119,11 +119,15 @@ c13 <-
     regions = list(PR = "62"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(32618)
+  st_transform(3347)
 c13 <- c13%>%
   mutate (CMA_UID = NA)
 
-canada <- rbind(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13)
+canada <- rbind(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13)%>%
+  set_names(c("Area", "Quality", "Type", "Dwellings",
+              "Households", "GeoUID", "NHS", "Population", "name",
+              "PR_UID", "CSD_UID", "CMA_UID", "geometry"))
+remove(c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13)
 
 
 variables_pop = c("v_CA16_401", "v_CA16_402","v_CA16_403","v_CA16_404","v_CA16_405","v_CA16_406")
@@ -145,7 +149,7 @@ DA <-
     dataset = 'CA16',regions=list(CSD=citycode), level = 'DA', 
     vectors =  c(variables_pop, variables_housing, variables_income),
     geo_format = "sf") %>%
-  st_transform(32618) 
+  st_transform(3347) 
 
 
 names(DA) <- c("area","type","dwellings1","households1", "GEOUID", "population1",
@@ -198,7 +202,7 @@ DA11 <-
                  "v_CA11N_1744", #mobilitytotal5,
                  "v_CA11N_1750"), #movers5year
     geo_format = "sf") %>%
-  st_transform(32618) 
+  st_transform(3347) 
 
 names(DA11) <- c("area", "quality_flags", "type", "dwellings", "households", "GEOUID", "NHS_nonreturn", "population", "CDUID", "CSD_UID", "Region","area2","NHS_nonreturn2","total_tenure","owner","renter","rentpressure_owner","rentpressure_renter","medianrent","avgrent","medianownership","avgownership","mediandwellingvalue","avgdwellingvalue","lowinc","total_mobility1","movers1year","total_mobility5","movers5year", "usual_residents", "geometry")
 
@@ -230,7 +234,7 @@ DA06 <-
                  "v_CA06_460", #mobilitytotal5,
                  "v_CA06_462"), #movers5year
     geo_format = "sf") %>%
-  st_transform(32618) 
+  st_transform(3347) 
 
 names(DA06) <- c("area","quality_flags","type","dwellings","households","GeoUID","population","CD_UID","CSD_UID","region","area2","total_tenure","owner","renter","rentalpressure_owner_total","rentalpressure_owner","rentalpressure_renter","avghomecosts","avgdwellingvalue","rentalpressure_renter_total","avgrent","lowinc","total_mobility1","movers1year","total_mobility5","movers5year","geometry")
 
@@ -263,7 +267,7 @@ DA01 <-
                  "v_CA01_390", #mobilitytotal5,
                  "v_CA01_392"), #movers5year
     geo_format = "sf") %>%
-  st_transform(32618) 
+  st_transform(3347) 
 
 names(DA01) <- c("area","type","dwellings","households","GeoUID","key","population","CD_UID","CSD_UID","region","area2","total_tenure","owner", 
                  "renter","rentalpressure_owner_total","rentalpressure_owner","rentalpressure_renter_total", "rentalpressure_renter","avgrent", 
@@ -287,7 +291,7 @@ DA01 <-
 #property <- MT_property
 #remove(MT_daily,MT_property)
 #property <- property%>%
-#  st_transform(32618) 
+#  st_transform(3347) 
 
 property <-
   read_csv("data/PEC_property.csv", col_types = cols_only(
@@ -309,7 +313,7 @@ property <-
               "Airbnb_HID", "HomeAway_PID", "HomeAway_HID")) %>% 
   arrange(Property_ID) %>% 
   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
-  st_transform(32618) %>% 
+  st_transform(3347) %>% 
   filter(Property_Type %in% c(
     "House", "Private room in house", "Apartment", "Cabin",
     "Entire condominium", "Townhouse", "Condominium", "Entire apartment",

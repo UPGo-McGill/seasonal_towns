@@ -1,4 +1,8 @@
+#################### IMPORT ALL TOURIST INDUSTRY CATEGORIES #####################
 
+source("R/01_helper_functions.R")
+
+###
 
 ca_561520 <-
   read_csv("data/561520.csv")%>%
@@ -193,15 +197,84 @@ ca_712190 <-
               "5_9", "50_99", "500plus"))%>%
   mutate(code= 712190)
 
+ca_483115  <-
+  read_csv("data/483115.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 483115)
+
+ca_483116 <-
+  read_csv("data/483116.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 483116)
+
+ca_483214 <-
+  read_csv("data/483214.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 483214)
+
+ca_483213 <-
+  read_csv("data/483213.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 483213)
+
+ca_713110 <-
+  read_csv("data/713110.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 713110)
+
+ca_713210 <-
+  read_csv("data/713210.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 713210)
+
+ca_713910 <-
+  read_csv("data/713910.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 713910)
+
+ca_485990 <-
+  read_csv("data/485990.csv")%>%
+  set_names(c("PROV_CSD", "Total", "Subtotal", "Indeterminate",
+              "1_4", "10_19", "100_199", "20_49", "200_499",
+              "5_9", "50_99", "500plus"))%>%
+  mutate(code= 485990)
+
+
 df <- rbind(ca_561510,ca_561520, ca_561590,
-            ca_713990, 
-            ca_721111, ca_721113, 
-            ca_721114, 
-            ca_721120, ca_721191, ca_721192, ca_721198, ca_487110, ca_487210, 
-            ca_487990, ca_713920, ca_713930, ca_713940, ca_721211, 
-            ca_721212, 
-            ca_721213, ca_721310, ca_722110, ca_722210,
-            ca_712120, ca_712190)
+            #hotels, resorts, casino hotels, bnb
+            ca_721111, ca_721113,  ca_721120, ca_721191, ca_721192, ca_721198,
+            #motel:  ca_721114, 
+            #scenic transportation: 
+            ca_487110, ca_487210, ca_487990, 
+            #skiing, marinas, golf, fitness and recreation
+            ca_713920, ca_713930, ca_485990, ca_713990, #ca_713940,
+            # RV and camping
+            ca_721211, ca_721212, ca_721213, 
+            #boarding: ca_721310, 
+            #food and dining
+            ca_722110, ca_722210,
+            #historic and parks
+            ca_712120, ca_712190,
+            #deep sea:  ca_483115, ca_483116, 
+            #inland water:  
+            ca_483214, ca_483213)
+            #amusement, theme parks etc
+            # ca_713110, ca_713210, ca_713910)
+
 
 df <- df%>%
   filter(str_detect(PROV_CSD, "-"))%>%
@@ -221,43 +294,6 @@ result <- result%>%
   mutate(tourism_prop= Total/ Population)
 
 result%>%
-  filter(Population>=1000)%>%
+  filter(Population>=1200)%>%
+  filter(is.na(CMA_UID))%>%
   View()
-
-#### ADD WEIGHTING FOR BUSINESS SIZE
-
-weighted <- df%>%
-  mutate(weighting = `100_199`*0.2 +`200_499`*0.33+`500plus`*0.4)
-
-weighted <- weighted %>% 
-  group_by(GeoUID) %>% 
-  mutate(total2 =Total+weighting )%>%
-  summarise_each(list(sum))
-
-weighted <- inner_join(weighted,canada)
-weighted <- weighted%>%
-  mutate(tourism_prop= total2/ Population)
-
-weighted%>%
-  filter(Population>=1000)%>%
-  View()
-
-
-###
-
-codes%>%
-  filter(str_detect(name, "Thompson-Nicola A"), Total>1)
-
-inner_join(result,canada)
-
-  
-
-
-colnames(workforce)[colnames(workforce)=="GEO_CODE (POR)"] <- "GEO_CODE"
-
-
-workforce%>%
-  filter(GEO_CODE == "5931020")%>%
-  View()
-
-
