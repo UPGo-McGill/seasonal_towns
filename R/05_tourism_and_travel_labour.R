@@ -69,13 +69,28 @@ ca_713990 <-
 
 df <- rbind(ca_561510,ca_561520, ca_561590, ca_713990, ca_721111, ca_721113, 
             ca_721114, ca_721120, ca_721191, ca_721192, ca_721198)
-result <- df %>% group_by(PROV_CSD) %>% summarise(Count = sum(Total))
+
+df <- df%>%
+  filter(str_detect(PROV_CSD, "-"))%>%
+  separate(PROV_CSD, c("GeoUID", "name"), " - ")
+
+result <- df %>% 
+  group_by(GeoUID) %>% 
+  summarise(Count = sum(Total))
+
+tst <- inner_join(result,canada)
+tst <- tst%>%
+  mutate(tourism_prop= Count/ Population)
+
+tst%>%
+  filter(Population>=1500)%>%
+  View()
 
 library(stringr)
 
-result%>%
-  filter(str_detect(PROV_CSD, "-"))%>%
-  separate(PROV_CSD, c("CSD", "name"), " - ")
+
+
+inner_join(result,canada)
 
   
 

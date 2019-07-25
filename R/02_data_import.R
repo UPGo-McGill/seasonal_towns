@@ -120,8 +120,11 @@ c13 <-
     level = "CSD",
     geo_format = "sf") %>% 
   st_transform(32618)
+c13 <- c13%>%
+  mutate (CMA_UID = NA)
 
 canada <- rbind(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13)
+
 
 variables_pop = c("v_CA16_401", "v_CA16_402","v_CA16_403","v_CA16_404","v_CA16_405","v_CA16_406")
 variables_pop_names = 
