@@ -3,7 +3,6 @@
 source("R/01_helper_functions.R")
 
 ###
-
 End_date <- as.Date("2019-04-30")
 Start_date <- as.Date("2016-07-01")
 
@@ -11,33 +10,23 @@ citycode = "2478102"
 
 PR_Codes <- filter(list_census_regions(dataset = "CA11"), level == "PR") 
 
-#CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
-#CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
+CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
+CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
 
 #CSD_Codes%>%
-#  filter(str_detect(name, "Tremblant"))
+#filter(str_detect(name, "Banff"))
 
-#c1 <- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(C = "1"),  
-    level = "CMA",
-    geo_format = "sf") %>% 
-  st_transform(3347)
 
-#canada_CMA <- c1
-
+load("data/canada_CMA.Rdata", .GlobalEnv)
 canada_CSD <- 
   get_census(
     dataset = "CA16", 
     regions = list(C = "1"),  
     level = "CSD",
     geo_format = "sf") %>% 
-  st_transform(3347)
-
-#set_names(c("Area", "Quality", "Type", "Dwellings",
-#            "Households", "GeoUID", "NHS", "Population", "name",
-#            "PR_UID", "CSD_UID", "CMA_UID", "geometry"))
+  st_transform(3347)%>%
+  set_names(c("Area", "Type", "Dwellings", "Households", "GeoUID", "Population", "Name", 
+            "Adj_Population","PR_UID", "CSD_UID", "CMA_UID", "geometry"))
 
 
 variables_pop = c("v_CA16_401", "v_CA16_402","v_CA16_403","v_CA16_404","v_CA16_405","v_CA16_406")
@@ -195,7 +184,7 @@ DA01 <-
 
 ## DATA IMPORT FROM Rdata FILE
 
-#load("data/MT_property.Rdata", .GlobalEnv)
+
 #load("data/MT_daily.Rdata", .GlobalEnv)
 #daily <- MT_daily
 #property <- MT_property
@@ -204,23 +193,26 @@ DA01 <-
 #  st_transform(3347) 
 
 property <-
-  read_csv("data/PEC_property.csv", col_types = cols_only(
-    `Property_ID` = col_character(),
-    `Listing_Title` = col_character(),
-    `Property_Type` = col_character(),
-    `Listing_Type` = col_character(),
-    `Created` = col_date(format = ""),
-    `Scraped` = col_date(format = ""),
+  read_csv("data/ca_property.csv", col_types = cols_only(
+    `Property ID` = col_character(),
+    `Listing Title` = col_character(),
+    `Property Type` = col_character(),
+    `Listing Type` = col_character(),
+    `Created Date` = col_date(format = ""),
+    `Last Scraped Date` = col_date(format = ""),
+    `Country` = col_skip(),
     Latitude = col_double(),
     Longitude = col_double(),
-    `City` = col_skip(),
-    `Airbnb_PID` = col_double(),
-    `Airbnb_HID` = col_double(),
-    `HomeAway_PID` = col_character(),
-    `HomeAway_HID` = col_character())) %>% 
+    `State` = col_character(),
+    `City` = col_character(),
+    `Annual Revenue LTM (USD)` = col_double(),
+    `Airbnb Property ID` = col_double(),
+    `Airbnb Host ID` = col_double(),
+    `HomeAway Property ID` = col_character(),
+    `HomeAway Property Manager` = col_character())) %>% 
   set_names(c("Property_ID", "Listing_Title", "Property_Type", "Listing_Type",
-              "Created", "Scraped", "Latitude", "Longitude", "Airbnb_PID",
-              "Airbnb_HID", "HomeAway_PID", "HomeAway_HID")) %>% 
+              "Created", "Scraped", "Latitude", "Longitude", "Province", 
+              "City", "Annual_Revenue", "Airbnb_PID", "Airbnb_HID", "HomeAway_PID", "HomeAway_HID")) %>% 
   arrange(Property_ID) %>% 
   st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
   st_transform(3347) %>% 
@@ -279,11 +271,11 @@ daily <-
 ## Trim listings to city geometry and inputted dates
 property <-
   property %>% 
-  filter(Property_ID %in% daily$Property_ID,
+  filter(#Property_ID %in% daily$Property_ID,
          Scraped >= Start_date,
-         Created <= End_date) %>% 
-    st_join(st_buffer(city["geometry"], 200),
-          join = st_within, left = FALSE)
+         Created <= End_date) #%>% 
+  #  st_join(st_buffer(city["geometry"], 200),
+  #        join = st_within, left = FALSE)
 
 daily <- 
   daily %>% 

@@ -289,11 +289,36 @@ result <- df %>%
   group_by(GeoUID) %>% 
   summarise_each(list(sum))
 
-result <- inner_join(result,canada)
+result <- inner_join(result,canada_CSD)
 result <- result%>%
   mutate(tourism_prop= Total/ Population)
 
 result%>%
   filter(Population>=1200)%>%
+  filter(is.na(CMA_UID))%>%
+  View()
+
+### ALTERNATIVE: Using size of businesses = number of employees
+
+codes_prop <- df %>%
+  mutate(`1_4`= `1_4`*2.5)%>%
+  mutate(`10_19`= `10_19`*14.5)%>%
+  mutate(`100_199`= `100_199`*149.5)%>%
+  mutate(`20_49`= `20_49`*34.5)%>%
+  mutate(`200_499`= `200_499`*349.5)%>%
+  mutate(`5_9`= `5_9`*7)%>%
+  mutate(`50_99`= `50_99`*149)%>%
+  mutate(`500plus`= `500plus`*500)
+
+result_prop <- codes_prop %>% 
+  group_by(GeoUID) %>% 
+  summarise_each(list(sum))
+
+result_prop <- inner_join(result_prop,canada)
+result_prop <- result_prop%>%
+  mutate(tourism_prop= Total/ Population)
+
+result_prop%>%
+  filter(Population>=1500)%>%
   filter(is.na(CMA_UID))%>%
   View()

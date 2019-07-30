@@ -15,6 +15,8 @@ library(rmarkdown)
 library(tinytex)
 library(grid)
 library(stringr)
+library(data.table)
+
 
 
 
