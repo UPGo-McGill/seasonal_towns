@@ -1,6 +1,7 @@
 ############ DATA AND BOUNDARY IMPORT FOR ALL SEASONAL TOWNS ###############
 
 source("R/01_helper_functions.R")
+source("R/02_data_import.R")
 
 ######### DEFINE YEARS #######
 
@@ -18,29 +19,8 @@ property_mt2 <-
   st_intersection(property, city)
 
 ## Get shapes and centroids
-quebec<- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(PR = "24"),  
-    level = "CSD",
-    geo_format = "sf") %>% 
-  st_transform(3347)
 
-bc <- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(PR = "59"),  
-    level = "CSD",
-    geo_format = "sf") %>% 
-  st_transform(3347)
-
-ontario <- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(PR = "35"),  
-    level = "CSD",
-    geo_format = "sf") %>% 
-  st_transform(3347)
+canada_CSD
 
 ## City census and centroid
 mont_tremblant<- 
@@ -61,17 +41,7 @@ pec<-
     geo_format = "sf") %>% 
   st_transform(3347)
 
-pec_c <-  st_centroid(prince_edward)
-
-blue_mountains<- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(CSD = "3542045"),  
-    level = "CSD",
-    geo_format = "sf") %>% 
-  st_transform(3347)
-
-blue_mountains_c <-  st_centroid(blue_mountains)
+pec_c <-  st_centroid(pec)
 
 whistler<- 
   get_census(
@@ -93,6 +63,16 @@ tofino<-
 
 tofino_c <-  st_centroid(tofino)
 
+banff<- 
+  get_census(
+    dataset = "CA16", 
+    regions = list(CSD = "4815035"),
+    level = "CSD",
+    geo_format = "sf") %>% 
+  st_transform(3347)
+
+banff_c <-  st_centroid(banff)
+
 ## Urban agglomerations
 toronto<- 
   get_census(
@@ -104,18 +84,19 @@ toronto<-
 
 toronto_c <-  st_centroid(toronto)
 ### Toronto radius
-dist_pec <- as.numeric(st_distance(toronto_c,pec_c))
+#dist_pec <- as.numeric(st_distance(toronto_c,pec_c))
 ##add a buffer"
 ##radius_toronto <- radius_toronto+10000 
-radius_pec <- st_buffer(toronto_c, dist_pec)
+radius_toronto <- st_buffer(toronto_c, 400000)
 
-pec_intersect <- st_intersection(ontario, radius_pec)
-pec_intersect <- pec_intersect%>%
-  filter(Type == "CSD", Population >= 6000, Population <= 11000)
-plot(radius_pec$geometry)
+toronto_intersect <- st_intersection(canada_CSD, radius_toronto$geometry)
+
+toronto_intersect <- toronto_intersect%>%
+  filter(Type == "CSD", Population >= 1500, Population <= 11000)
+plot(radius_toronto$geometry)
 plot(toronto, add=TRUE)
 plot(pec, add=TRUE)
-plot(pec_intersect$geometry, add=TRUE)
+plot(toronto_intersect$geometry, add=TRUE)
 
 
 ##
