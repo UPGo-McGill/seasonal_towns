@@ -3,24 +3,15 @@
 source("R/01_helper_functions.R")
 source("R/02_data_import.R")
 
-######### DEFINE YEARS #######
+###############
 
-
-#CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA")
-#CMA_Codes%>%
-#  filter(str_detect(name, "Calgary"))
-
-### Select by city name
-property_mt <- property%>%
-  filter(str_detect(City,"Mont-Tremblant"))
-
-### Select by city boundaries
-property_mt2 <- 
-  st_intersection(property, city)
-
-## Get shapes and centroids
-
-canada_CSD
+property_pec <- property%>%
+  filter(str_detect( City, "Prince Edward County"))
+property_blue_mountains <- property%>%
+  filter(str_detect( City, "Blue Mountains"))
+property_mont_tremblant <- property%>%
+  filter(str_detect( City, "Mont-Tremblant"))
+property_banff <- st_intersection(property, st_buffer(banff, 200))
 
 ## City census and centroid
 mont_tremblant<- 
@@ -30,7 +21,6 @@ mont_tremblant<-
     level = "CSD",
     geo_format = "sf") %>% 
   st_transform(3347)
-
 mont_tremblant_c <-  st_centroid(mont_tremblant)
 
 pec<- 
@@ -40,7 +30,6 @@ pec<-
     level = "CSD",
     geo_format = "sf") %>% 
   st_transform(3347)
-
 pec_c <-  st_centroid(pec)
 
 whistler<- 
@@ -50,7 +39,6 @@ whistler<-
     level = "CSD",
     geo_format = "sf") %>% 
   st_transform(3347)
-
 whistler_c <-  st_centroid(whistler)
 
 tofino<- 
@@ -60,7 +48,6 @@ tofino<-
     level = "CSD",
     geo_format = "sf") %>% 
   st_transform(3347)
-
 tofino_c <-  st_centroid(tofino)
 
 banff<- 
@@ -70,7 +57,6 @@ banff<-
     level = "CSD",
     geo_format = "sf") %>% 
   st_transform(3347)
-
 banff_c <-  st_centroid(banff)
 
 ## Urban agglomerations
@@ -81,23 +67,13 @@ toronto<-
     level = "CMA",
     geo_format = "sf") %>% 
   st_transform(3347)
-
 toronto_c <-  st_centroid(toronto)
-### Toronto radius
-#dist_pec <- as.numeric(st_distance(toronto_c,pec_c))
-##add a buffer"
+
 ##radius_toronto <- radius_toronto+10000 
-radius_toronto <- st_buffer(toronto_c, 400000)
-
+radius_toronto <- st_buffer(toronto_c, 250000)
 toronto_intersect <- st_intersection(canada_CSD, radius_toronto$geometry)
-
 toronto_intersect <- toronto_intersect%>%
-  filter(Type == "CSD", Population >= 1500, Population <= 11000)
-plot(radius_toronto$geometry)
-plot(toronto, add=TRUE)
-plot(pec, add=TRUE)
-plot(toronto_intersect$geometry, add=TRUE)
-
+  filter(Type == "CSD", Population >= 1500)
 
 ##
 montreal<- 
@@ -108,91 +84,107 @@ montreal<-
     geo_format = "sf") %>% 
   st_transform(3347)
 
-montreal_c <-  st_centroid(mtl)
-### Find all municipalities within radius of mtl 
-dist_mtl <- as.numeric(st_distance(mtl_c,mont_tremblant_c))
+montreal_c <-  st_centroid(montreal)
 ##add a buffer"
 #radius_mtl <- radius_mtl+10000 
-radius_mtl <- st_buffer(mtl_c, dist_mtl)
+radius_montreal <- st_buffer(montreal_c, 250000)
 
-mt_intersect <- st_intersection(quebec, radius_mtl)
-mt_intersect <- mt_intersect%>%
-  filter(Type == "CSD", Population >= 6000, Population <= 11000)
-
-plot(radius_mtl$geometry)
-plot(mtl, add=TRUE)
-plot(mont_tremblant, add=TRUE)
-plot(mt_intersect,add=TRUE)
-
+montreal_intersect <- st_intersection(canada_CSD, radius_montreal)
+montreal_intersect <- montreal_intersect%>%
+  filter(Type == "CSD", Population >= 1500, Population <= 11000)
 
 ########
-vancouver<- 
+
+calgary<- 
   get_census(
     dataset = "CA16", 
-    regions = list(CMA = "59933"),  
+    regions = list(CMA = "48825"),  
     level = "CMA",
     geo_format = "sf") %>% 
   st_transform(3347)
+calgary_c <-  st_centroid(calgary)
 
-vancouver_c <-  st_centroid(vancouver)
-dist_vancouver <- as.numeric(st_distance(vancouver_c,whistler_c))
-radius_vancouver <- st_buffer(vancouver_c, dist_vancouver)
-
-vancouver_intersect <- st_intersection(bc, radius_vancouver)
-vancouver_intersect <- vancouver_intersect%>%
-  filter(Type == "CSD", Population >= 6000, Population <= 11000)
-
-
-plot(radius_vancouver$geometry)
-plot(vancouver, add=TRUE)
-plot(whistler, add=TRUE)
-plot(vancouver_intersect,add=TRUE)
-########
-victoria<- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(CMA = "59935"),  
-    level = "CMA",
-    geo_format = "sf") %>% 
-  st_transform(3347)
-
-victoria_c <-  st_centroid(victoria)
-dist_victoria <- as.numeric(st_distance(victoria_c,tofino_c))
-radius_victoria <- st_buffer(victoria_c, dist_victoria)
-plot(radius_victoria$geometry)
-plot(victoria, add=TRUE)
-plot(tofino, add=TRUE)
-
-## Check distances
-dist_mtl
-dist_pec
-dist_vancouver
-dist_victoria
+radius_calgary <- st_buffer(calgary_c, 250000)
+calgary_intersect <- st_intersection(canada_CSD, radius_calgary)
+calgary_intersect <- calgary_intersect%>%
+  filter(Type == "CSD", Population >= 1500, Population <= 11000)
 
 ######################## ADD PROPERTIES ##################################
 
 ## Intersect property and radius around urban agglomerations
-pec_intersect
-pec_intersect <- pec_intersect%>%
-  filter(name!="Prince Edward County")
-pec_alentours <- st_intersection(property, pec_intersect)
+toronto_alentours_all <- st_intersection(property, toronto_intersect)
+toronto_alentours <- toronto_alentours_all %>%
+  filter((is.na(toronto_alentours_all$CMA_UID)==TRUE))%>%
+  filter(City!="Prince Edward County", City!="The Blue Mountains", Name!= "Prince Edward County (CY)", Name!="The Blue Mountains (T)")
+toronto_alentours_noCMA <- toronto_alentours_all %>%
+  filter((is.na(toronto_alentours_all$CMA_UID)==TRUE))
 
-pec_alentours <- pec_alentours%>%
-  filter()
+montreal_alentours_all <- st_intersection(property, montreal_intersect)
+montreal_alentours <- montreal_alentours_all %>%
+  filter((is.na(montreal_alentours_all$CMA_UID)==TRUE))%>%
+  filter(City!="Mont-Tremblant", Name!="Mont-Tremblant (V)")
+montreal_alentours_noCMA <- montreal_alentours_all %>%
+  filter((is.na(montreal_alentours_all$CMA_UID)==TRUE))
 
-## Plot to verify extents
-plot(radius_pec$geometry)
-plot(toronto, add=TRUE)
-plot(pec, add=TRUE)
-plot(pec_alentours, add=TRUE)
-plot(pec_intersect,add=TRUE)
+calgary_alentours_all <- st_intersection(property, calgary_intersect)
+calgary_alentours_noCMA <- calgary_alentours_all %>%
+  filter((is.na(calgary_alentours_all$CMA_UID)==TRUE))
+calgary_alentours <- calgary_alentours_noCMA%>%
+  filter(calgary_alentours_noCMA$Airbnb_PID %in% property_banff$Airbnb_PID ==FALSE)
+
+Annual_Rev <- aggregate(calgary_alentours$Annual_Revenue, by=list(GeoUID=calgary_alentours$GeoUID), FUN=sum)
+
+canada_CSD%>%
+  filter(GeoUID=="5901017")
+
+Listings_GeoUID <- calgary_alentours_noCMA%>%
+  group_by(GeoUID)%>%
+  count()
+Listings_GeoUID$geometry <- NULL
+
+tst <- inner_join(Annual_Rev, Listings_GeoUID)%>%
+  mutate(revperlist=x/n)
+
+Lperd <- inner_join(canada_CSD, tst)
+Lperd <- Lperd%>%
+  mutate(List_per_dwelling=n/Dwellings)
+View(Lperd)
 
 
-tm_shape(radius_mtl)+
+
+canada_CSD%>%
+  filter(GeoUID =="3531030")
+
+property_banff
+
+tm_shape(radius_toronto)+
+  tm_dots(col="white")+
+  tm_shape(toronto)+
   tm_borders(col="black")+
-  tm_shape(mtl)+
-  tm_fill(col="red")+
-  tm_shape(mt_intersect)+
-  tm_fill(col="green")+
-  tm_shape(mont_tremblant)+
-  tm_fill(col="blue")
+  tm_shape(Lperd)+
+  tm_fill(col="List_per_dwelling")+
+  tm_shape(canada_CSD)+
+  tm_borders(col="black")
+
+
+tst <- st_join(tst, canada_CSD)
+tst%>%
+  mutate(dperp=n/Population)
+
+#################
+
+Annual_Rev <- aggregate(montreal_alentours_noCMA$Annual_Revenue, by=list(GeoUID=montreal_alentours_noCMA$GeoUID), FUN=sum)
+
+Listings_GeoUID <- montreal_alentours_noCMA%>%
+  group_by(GeoUID)%>%
+  count()
+Listings_GeoUID$geometry <- NULL
+
+tst <- inner_join(Annual_Rev, Listings_GeoUID)%>%
+  mutate(revperlist=x/n)
+
+Lperd <- inner_join(canada_CSD, Listings_GeoUID)
+Lperd <- Lperd%>%
+  mutate(List_per_dwelling=n/Dwellings)
+View(Lperd)
+
