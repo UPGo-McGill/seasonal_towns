@@ -1,8 +1,8 @@
 ##################################### ANALYSIS ########################################
 
-source("R/01_helper_functions.R")
-source("R/00_strr_raffle.R")
-source("R/02_data_import.R")
+#source("R/01_helper_functions.R")
+#source("R/00_strr_raffle.R")
+#source("R/02_data_import.R")
 
 ######### DEFINE YEARS #######
 
@@ -15,29 +15,29 @@ year_prior_prior$year <- year_prior$year - 1
 exchange_rate <- 1.34
 
 ###### RUN RAFFLE ########
-run_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
-intersection <- st_intersection(DA, run_raffle)
+#run_raffle <- strr_raffle(property, DA, GEOUID, dwellings)
+#intersection <- st_intersection(DA, run_raffle)
 
 ## Number of listings in DA with raffle
-DA_raffle <- intersection %>% 
-  filter(FREH == TRUE)%>%
-  count(winner)%>%
-  st_drop_geometry()
-DA_raffle <- DA_raffle%>%
-  rename(GEOUID = winner, raffle_n = n)
+#DA_raffle <- intersection %>% 
+#  filter(FREH == TRUE)%>%
+#  count(winner)%>%
+#  st_drop_geometry()
+#DA_raffle <- DA_raffle%>%
+#  rename(GEOUID = winner, raffle_n = n)
 
 ## number of listings in DA without raffle
-intersection <- intersection %>% 
-  group_by(GEOUID) %>% 
-  count()%>%
-  st_drop_geometry()%>%
-  rename(no_raffle_n = n)
+#intersection <- intersection %>% 
+#  group_by(GEOUID) %>% 
+#  count()%>%
+#  st_drop_geometry()%>%
+#  rename(no_raffle_n = n)
 
-DA_raffle <- inner_join(intersection, DA_raffle)
-DA_raffle <- inner_join(DA, DA_raffle)
-DA_raffle <- DA_raffle%>%
-  mutate (lperd_no_raffle = no_raffle_n/dwellings*100,
-          lperd_raffle = raffle_n/dwellings*100)
+#DA_raffle <- inner_join(intersection, DA_raffle)
+#DA_raffle <- inner_join(DA, DA_raffle)
+#DA_raffle <- DA_raffle%>%
+#  mutate (lperd_no_raffle = no_raffle_n/dwellings*100,
+#          lperd_raffle = raffle_n/dwellings*100)
 
 #### RUN NUMBERS #######
 

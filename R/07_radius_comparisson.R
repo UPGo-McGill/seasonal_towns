@@ -75,6 +75,24 @@ toronto_intersect <- st_intersection(canada_CSD, radius_toronto$geometry)
 toronto_intersect <- toronto_intersect%>%
   filter(Type == "CSD", Population >= 1500)
 
+
+## Urban agglomerations
+vancouver<- 
+  get_census(
+    dataset = "CA16", 
+    regions = list(CMA = "59933"),  
+    level = "CMA",
+    geo_format = "sf") %>% 
+  st_transform(3347)
+vancouver_c <-  st_centroid(vancouver)
+
+##radius_toronto <- radius_toronto+10000 
+radius_vancouver <- st_buffer(vancouver_c, 400000)
+vancouver_intersect <- st_intersection(canada_CSD, radius_vancouver$geometry)
+vancouver_intersect <- vancouver_intersect%>%
+  filter(Type == "CSD", Population >= 1000)
+
+
 ##
 montreal<- 
   get_census(
@@ -91,7 +109,7 @@ radius_montreal <- st_buffer(montreal_c, 250000)
 
 montreal_intersect <- st_intersection(canada_CSD, radius_montreal)
 montreal_intersect <- montreal_intersect%>%
-  filter(Type == "CSD", Population >= 1500, Population <= 11000)
+  filter(Type == "CSD", Population >= 1500)
 
 ########
 
@@ -107,24 +125,29 @@ calgary_c <-  st_centroid(calgary)
 radius_calgary <- st_buffer(calgary_c, 250000)
 calgary_intersect <- st_intersection(canada_CSD, radius_calgary)
 calgary_intersect <- calgary_intersect%>%
-  filter(Type == "CSD", Population >= 1500, Population <= 11000)
+  filter(Type == "CSD", Population >= 1000)
 
 ######################## ADD PROPERTIES ##################################
+save(calgary_intersect, file="Calgary_CSD.RData")
+save(montreal_intersect, file="Montreal_CSD.RData")
+save(vancouver_intersect, file="Vancouver_CSD.RData")
+save(toronto_intersect, file="Toronto_CSD.RData")
+
 
 ## Intersect property and radius around urban agglomerations
+
 toronto_alentours_all <- st_intersection(property, toronto_intersect)
-toronto_alentours <- toronto_alentours_all %>%
-  filter((is.na(toronto_alentours_all$CMA_UID)==TRUE))%>%
+toronto_alentours_noCMA <- toronto_al %>%
+  filter((is.na(toronto_al$CMA_UID)==TRUE))
+toronto_alentours <- toronto_alentours_noCMA %>%
   filter(City!="Prince Edward County", City!="The Blue Mountains", Name!= "Prince Edward County (CY)", Name!="The Blue Mountains (T)")
-toronto_alentours_noCMA <- toronto_alentours_all %>%
-  filter((is.na(toronto_alentours_all$CMA_UID)==TRUE))
+
 
 montreal_alentours_all <- st_intersection(property, montreal_intersect)
-montreal_alentours <- montreal_alentours_all %>%
-  filter((is.na(montreal_alentours_all$CMA_UID)==TRUE))%>%
-  filter(City!="Mont-Tremblant", Name!="Mont-Tremblant (V)")
 montreal_alentours_noCMA <- montreal_alentours_all %>%
   filter((is.na(montreal_alentours_all$CMA_UID)==TRUE))
+montreal_alentours <- montreal_alentours_all %>%
+  filter(City!="Mont-Tremblant", Name!="Mont-Tremblant (V)")
 
 calgary_alentours_all <- st_intersection(property, calgary_intersect)
 calgary_alentours_noCMA <- calgary_alentours_all %>%
@@ -132,59 +155,190 @@ calgary_alentours_noCMA <- calgary_alentours_all %>%
 calgary_alentours <- calgary_alentours_noCMA%>%
   filter(calgary_alentours_noCMA$Airbnb_PID %in% property_banff$Airbnb_PID ==FALSE)
 
-Annual_Rev <- aggregate(calgary_alentours$Annual_Revenue, by=list(GeoUID=calgary_alentours$GeoUID), FUN=sum)
+vancouver_alentours_all <- st_intersection(property, vancouver_intersect)
+vancouver_alentours_noCMA <- vancouver_alentours_all %>%
+  filter((is.na(vancouver_alentours_all$CMA_UID)==TRUE))
+vancouver_alentours <- vancouver_alentours_all%>%
+  filter(City!="Whistler", Name!="Whistler (DM)")
 
-canada_CSD%>%
-  filter(GeoUID=="5901017")
+tm_shape(radius_vancouver)+
+  tm_borders(col="grey")+
+  tm_shape(vancouver_al)+
+  tm_dots(col = "red")
 
-Listings_GeoUID <- calgary_alentours_noCMA%>%
+#############
+
+van_Listings <- vancouver_alentours_all%>%
   group_by(GeoUID)%>%
   count()
-Listings_GeoUID$geometry <- NULL
+van_Listings$geometry <- NULL
 
-tst <- inner_join(Annual_Rev, Listings_GeoUID)%>%
-  mutate(revperlist=x/n)
+#van_Rev <- aggregate(vancouver_alentours$Annual_Revenue, by=list(GeoUID=vancouver_alentours$GeoUID), FUN=sum)
 
-Lperd <- inner_join(canada_CSD, tst)
-Lperd <- Lperd%>%
+#van_Data <- inner_join(van_Rev, van_Listings)%>%
+#  mutate(revperlist=x/n)
+
+van_Data <- inner_join(canada_CSD, van_Listings)
+van_Data <- van_Data%>%
   mutate(List_per_dwelling=n/Dwellings)
-View(Lperd)
+View(van_Data)
 
+cal_Listings <- calgary_alentours_all%>%
+  group_by(GeoUID)%>%
+  count()
+cal_Listings$geometry <- NULL
 
+#cal_Rev <- aggregate(calgary_alentours$Annual_Revenue, by=list(GeoUID=calgary_alentours$GeoUID), FUN=sum)
 
-canada_CSD%>%
-  filter(GeoUID =="3531030")
+#cal_Data <- inner_join(cal_Rev, cal_Listings)%>%
+#  mutate(revperlist=x/n)
 
-property_banff
+cal_Data <- inner_join(canada_CSD, cal_Listings)
+cal_Data <- cal_Data%>%
+  mutate(List_per_dwelling=n/Dwellings)
+View(cal_Data)
 
-tm_shape(radius_toronto)+
-  tm_dots(col="white")+
-  tm_shape(toronto)+
-  tm_borders(col="black")+
-  tm_shape(Lperd)+
-  tm_fill(col="List_per_dwelling")+
-  tm_shape(canada_CSD)+
-  tm_borders(col="black")
-
-
-tst <- st_join(tst, canada_CSD)
-tst%>%
-  mutate(dperp=n/Population)
 
 #################
 
-Annual_Rev <- aggregate(montreal_alentours_noCMA$Annual_Revenue, by=list(GeoUID=montreal_alentours_noCMA$GeoUID), FUN=sum)
-
-Listings_GeoUID <- montreal_alentours_noCMA%>%
+mtl_Listings <- montreal_alentours_all%>%
   group_by(GeoUID)%>%
   count()
-Listings_GeoUID$geometry <- NULL
+mtl_Listings$geometry <- NULL
 
-tst <- inner_join(Annual_Rev, Listings_GeoUID)%>%
-  mutate(revperlist=x/n)
+#mtl_Rev <- aggregate(montreal_alentours_noCMA$Annual_Revenue, by=list(GeoUID=montreal_alentours_noCMA$GeoUID), FUN=sum)
 
-Lperd <- inner_join(canada_CSD, Listings_GeoUID)
-Lperd <- Lperd%>%
+#mtl_Data <- inner_join(mtl_Rev, mtl_Listings)%>%
+#  mutate(revperlist=x/n)
+
+mtl_Data <- inner_join(canada_CSD, mtl_Listings)
+mtl_Data <- mtl_Data%>%
   mutate(List_per_dwelling=n/Dwellings)
-View(Lperd)
+View(mtl_Data)
 
+
+#######
+
+tor_Listings <- toronto_alentours_all%>%
+  group_by(GeoUID)%>%
+  count()
+tor_Listings$geometry <- NULL
+
+tor_Data <- inner_join(canada_CSD, tor_Listings)
+tor_Data <- tor_Data%>%
+  mutate(List_per_dwelling=n/Dwellings)
+View(tor_Data)
+
+figureA <- 
+  tm_shape(radius_toronto)+
+  tm_borders(col="grey", lty="dashed")+
+  tm_shape(tor_Data)+
+  tm_fill(col="List_per_dwelling",
+          palette="Oranges",  
+          border.col = "#f0f0f0",
+          border.alpha = .2,
+           breaks = c(0,0.025,0.05,0.075,0.1,0.15, 0.2),
+          title="Listings per Dwellings")+
+  #   legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
+  tm_shape(canada_CSD)+
+  tm_borders(col="lightgrey")+
+  tm_shape(toronto)+
+  tm_borders(col="black")+
+  tm_legend(position = c("right", "bottom"),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .25, title.size = 1)+
+  tm_add_legend(type="fill",
+                col= "grey",
+                labels=c("Toronto CMA"),
+                border.lwd = NA,
+                alpha = 1)
+#                title="Listing Type")
+tmap_save(figureA, "output/figureA.png", width = 2400, height = 1500)
+
+
+figureB <- 
+  tm_shape(radius_montreal)+
+  tm_borders(col="grey", lty="dashed")+
+  tm_shape(mtl_Data)+
+  tm_fill(col="List_per_dwelling",
+          palette="Oranges",  
+          border.col = "#f0f0f0",
+          border.alpha = .2,
+         breaks = c(0,0.025,0.05,0.075,0.1,0.15,Inf),
+          title="Listings per Dwellings")+
+  #   legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
+  tm_shape(canada_CSD)+
+  tm_borders(col="lightgrey")+
+    tm_shape(montreal)+
+    tm_borders(col="black")+
+  tm_legend(position = c("right", "bottom"),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .25, title.size = 1)+
+  tm_add_legend(type="fill",
+                col= "grey",
+                labels=c("Montreal CMA"),
+                border.lwd = NA,
+                alpha = 1)
+#                title="Listing Type")
+tmap_save(figureB, "output/figureB.png", width = 2400, height = 1500)
+
+
+figureC <- 
+  tm_shape(radius_calgary)+
+  tm_borders(col="grey", lty="dashed")+
+  tm_shape(cal_Data)+
+  tm_fill(col="List_per_dwelling",
+          palette="Oranges",  
+          border.col = "#f0f0f0",
+          border.alpha = .2,
+          breaks = c(0,0.025,0.05,0.075,0.1,0.25,0.5,0.75,1.5,2, Inf),
+          title="Listings per Dwellings")+
+  #   legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
+  tm_shape(canada_CSD)+
+  tm_borders(col="lightgrey")+
+    tm_shape(calgary)+
+    tm_borders(col="black")+
+  tm_legend(position = c("right", "bottom"),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .25, title.size = 1)+
+  tm_add_legend(type="fill",
+                col= "grey",
+                labels=c("Calgary CMA"),
+                border.lwd = NA,
+                alpha = 1)
+#                title="Listing Type")
+tmap_save(figureC, "output/figureC.png", width = 2400, height = 1500)
+
+figureD <- 
+  tm_shape(radius_vancouver)+
+  tm_borders(col="grey", lty="dashed")+
+  tm_shape(vancouver)+
+  tm_fill(col="grey")+
+  tm_shape(van_Data)+
+  tm_fill(col="List_per_dwelling",
+          palette="Oranges",  
+          border.col = "#f0f0f0",
+          border.alpha = .2,
+          breaks = c(0,0.05,0.1, 0.15,0.2,0.30,0.45,Inf),
+          title="Listings per Dwellings")+
+  #   legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
+  tm_shape(canada_CSD)+
+  tm_borders(col="lightgrey")+
+  tm_shape(vancouver)+
+  tm_borders(col="black")+
+  #tm_shape(filter(van_Data, Name == "Whistler (DM)"))+
+  #tm_borders(col="red")+
+  tm_legend(position = c("left", "bottom"),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .25, title.size = 1)+
+  tm_add_legend(type="fill",
+                col= "grey",
+                labels=c("Calgary CMA"),
+                border.lwd = NA,
+                alpha = 1)
+#                title="Listing Type")
+tmap_save(figureD, "output/figureD.png", width = 2400, height = 1500)
