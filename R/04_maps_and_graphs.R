@@ -81,9 +81,9 @@ figure[[1]] <-
               border.alpha = .2,
               title = "Population Density (people per sq. kilometer)",
               breaks = c(0,50,100,250,500,1000,2000)) +
-  tm_credits("Picton", size = 1.3, position = c(0.48,0.45))+
-  tm_credits("Wellington", size = 1.3, position = c(0.135,0.3))
-
+  tm_credits("Picton", size = 1.1, position = c(0.48,0.45))+
+  tm_credits("Wellington", size = 1.1, position = c(0.135,0.3)) +
+  tm_credits("Sandbanks Provincial Park", size = 1.1, position = c(0.12,0.2))
 
 tmap_save(figure[[1]], "output/figure_1.png", width = 2400, height = 1500)
 
