@@ -1,0 +1,39 @@
+---
+title: "Prince Edward County: Catchy Title"
+output: html_document
+---
+
+```{r, include = FALSE}
+source("R/00_strr_raffle.R")
+source("R/01_helper_functions.R")
+source("R/02_data_import_PEC.R")
+source("R/03_analysis.R")
+source("R/04_maps_and_graphs.R")
+```
+
+****
+As libraries take on a greater role as community centres and fill social-service gaps, we need to understand the challenges they confront as a result of changing demographics and social needs in their local areas.
+
+This preliminary study was requested by the Canadian Urban Libraries Council. We conducted a spatial analysis, mapping over 500 urban libraries and a series of census variables to determine how demographics differed within library service areas and the wider city context.
+Overall, findings demonstrate systematically higher levels of social need within library walk-sheds, with higher core housing need, lower income, higher unemployment, and more visible minorities and immigrants when compared with surrounding areas.
+
+**Where are Airbnbs Located?**
+
+
+
+
+```{r, echo = FALSE, fig.cap="\\label{figure1} Figure 1: Active Airbnb Listings by Listing Type and Revenue", fig.align = 'center', message = FALSE}
+figure[[2]]
+```
+
+The number of listings has been increasing steadily since at least 2016 (Figtktkt). On average, over the past 12 months, there have been 1,230 active daily listings in Prince Edward County, increasing from 880 the 12 months prior. However, in recent months, the number of listings in the County reached a plateau, possibly as a result of the municipal discussions to regulate STRs, which gained traction in the county between September 2018, followed by the adoption of the draft licensing bylaw in October 2018. Further, individuals within the county have reported an oversaturation of the market, which may be deterring new commercial activity.
+
+** Hyper-Concentration of Revenue**
+
+Over the past 12 months, 26.9 million dollars were earned through the Airbnb platform, increasing from $18.9 million over the 12 months prior. Earnings were largely concentrated among a minority of hosts, much like urban Airbnb markets (Combs et al., 2019). In Prince Edward County, the top 1% of hosts earned a quarter of the revenue (19.5%) or $5.2 million, and the top 10% earned just under half (46%) or 12.4 million.
+
+```{r, echo = FALSE, fig.cap="\\label{figure1} Figure 1: Active Airbnb Listings by Listing Type and Revenue", fig.align = 'center', message = FALSE}
+figure2
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
