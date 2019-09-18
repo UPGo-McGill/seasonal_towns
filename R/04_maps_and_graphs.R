@@ -1,29 +1,42 @@
 ##################### MAPPING ##########################################
 
-#source("R/01_helper_functions.R")
+source("R/01_helper_functions.R")
 
 cityname <- "Prince Edward County"
 
-## IMPORT STREETS OSM
-#streets <- 
-#  getbb("Canada") %>% 
-#  opq() %>% 
-#  add_osm_feature(key = "highway") %>% 
-#  osmdata_sf()
+#IMPORT STREETS OSM
+streets <- 
+  getbb("prince edward county") %>% 
+  opq() %>% 
+  add_osm_feature(key = "highway") %>% 
+  osmdata_sf()
 
-#streets <- 
-#  rbind(streets$osm_polygons %>% st_cast("LINESTRING"),streets$osm_lines) %>% 
-#  as_tibble() %>% 
-#  st_as_sf() %>% 
-#  st_transform(32618) %>%
-#  select(osm_id, name, geometry)
+streets <- 
+  rbind(streets$osm_polygons %>% st_cast("LINESTRING"),streets$osm_lines) %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(32618) %>%
+  select(osm_id, name, geometry)
+
+
+parks <- 
+  getbb("prince edward county") %>% 
+  as.vector() %>%
+  opq() %>%
+  add_osm_feature(key = "leisure") %>%
+  osmdata_sf() %>% 
+  `$`(osm_polygons) %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(32618) %>%
+  select(osm_id, name, geometry)
 
 # IMPORT WATER
 
-#water <-read_sf("data","lhy_000c16a_e") 
-#water <- st_union(st_combine(water))
-#coastal_water <- read_sf("data", "lhy_000h16a_e")
-#coastal_water <- st_union(st_combine(coastal_water))
+water <-read_sf("data","lhy_000c16a_e") 
+water <- st_union(st_combine(water))
+coastal_water <- read_sf("data", "lhy_000h16a_e")
+coastal_water <- st_union(st_combine(coastal_water))
 
 ## CREATE BASEMAP 
 
@@ -33,14 +46,13 @@ base_map <- tm_shape(DA, bbox = bb(st_bbox(DA), xlim=c(-0.02, 1.02),
                                 ylim=c(0.01, 1.05), relative = TRUE),
                                 unit = "km") +
   tm_fill(col = "#f0f0f0") +
-#  tm_shape(streets)+
-#  tm_lines(col = "grey60") +
+
 #  tm_shape(coastal_water)+
 #  tm_fill(col = "black") + 
 #  tm_shape(water)+
 #  tm_fill(col = "black") +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
-  tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
+  tm_layout(frame = TRUE, main.title.size = 1.3, legend.title.size = 1.3, legend.text.size = .9,
             legend.title.fontfamily = "Futura-CondensedExtraBold",
             legend.position = c("right", "top"),
             fontfamily = "Futura-Medium",
@@ -67,9 +79,11 @@ figure[[1]] <-
               palette = "Purples",
               border.col = "#f0f0f0",
               border.alpha = .2,
-              title = "",
-              breaks = c(0,20,50,100,250,500,1000,2000)) +
-  tm_layout(title = "Figure 1. Population Density") 
+              title = "Population Density (people per sq. kilometer)",
+              breaks = c(0,50,100,250,500,1000,2000)) +
+  tm_credits("Picton", size = 1.1, position = c(0.48,0.45))+
+  tm_credits("Wellington", size = 1.1, position = c(0.135,0.3)) +
+  tm_credits("Sandbanks Provincial Park", size = 1.1, position = c(0.12,0.2))
 
 tmap_save(figure[[1]], "output/figure_1.png", width = 2400, height = 1500)
 
@@ -313,9 +327,8 @@ figure[[12]]<- base_map +
   tm_legend(position = c("right", "top"),
             bg.color = "white",
             bg.alpha=.2,
-            width = .25, title.size = 1)
-              
-  #tm_layout(title = "Figure X. Households spending 30%+ of income on housing, tenants and owners")
+            width = .25, title.size = 1)+
+tm_layout(title = "Figure X. Households spending 30%+ of income on housing")
 
 tmap_save(figure[[12]], "output/figure_12.png", width = 2400, height = 1500)
 
