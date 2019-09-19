@@ -16,9 +16,9 @@ exchange_rate <- 1.34
 
 ###  City codes
 #citycode = "2478102"
-#PR_Codes <- filter(list_census_regions(dataset = "CA11"), level == "PR") 
-#CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
-#CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
+PR_Codes <- filter(list_census_regions(dataset = "CA11"), level == "PR") 
+CMA_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CMA") 
+CSD_Codes <- filter(list_census_regions(dataset = "CA16"), level == "CSD")
 
 ## Find city code
 #CSD_Codes%>%

@@ -25,6 +25,9 @@ mont_tremblant_c <-  st_centroid(mont_tremblant)
 
 #################
 
+min_pop <- 1500
+buff_dist <- 250000
+
 montreal<- 
   get_census(
     dataset = "CA16", 
@@ -36,11 +39,11 @@ montreal<-
 montreal_c <-  st_centroid(montreal)
 ##add a buffer"
 #radius_mtl <- radius_mtl+10000 
-radius_montreal <- st_buffer(montreal_c, 250000)
+radius_montreal <- st_buffer(montreal_c, buff_dist)
 
 montreal_intersect <- st_intersection(canada_CSD, radius_montreal)
 montreal_intersect <- montreal_intersect%>%
-  filter(Type == "CSD", Population >= 1500)
+  filter(Type == "CSD", Population >= min_pop)
 
 montreal_alentours_all <- st_intersection(property, montreal_intersect)
 montreal_alentours_noCMA <- montreal_alentours_all %>%
@@ -147,10 +150,10 @@ toronto<-
 toronto_c <-  st_centroid(toronto)
 
 ##radius_toronto <- radius_toronto+10000 
-radius_toronto <- st_buffer(toronto_c, 250000)
+radius_toronto <- st_buffer(toronto_c, buff_dist)
 toronto_intersect <- st_intersection(canada_CSD, radius_toronto$geometry)
 toronto_intersect <- toronto_intersect%>%
-  filter(Type == "CSD", Population >= 1500)
+  filter(Type == "CSD", Population >= min_pop)
 
 
 ## Urban agglomerations
@@ -164,10 +167,10 @@ vancouver<-
 vancouver_c <-  st_centroid(vancouver)
 
 ##radius_toronto <- radius_toronto+10000 
-radius_vancouver <- st_buffer(vancouver_c, 400000)
+radius_vancouver <- st_buffer(vancouver_c, buff_dist)
 vancouver_intersect <- st_intersection(canada_CSD, radius_vancouver$geometry)
 vancouver_intersect <- vancouver_intersect%>%
-  filter(Type == "CSD", Population >= 1000)
+  filter(Type == "CSD", Population >= min_pop)
 
 
 ##
@@ -181,10 +184,10 @@ calgary<-
   st_transform(3347)
 calgary_c <-  st_centroid(calgary)
 
-radius_calgary <- st_buffer(calgary_c, 250000)
+radius_calgary <- st_buffer(calgary_c, buff_dist)
 calgary_intersect <- st_intersection(canada_CSD, radius_calgary)
 calgary_intersect <- calgary_intersect%>%
-  filter(Type == "CSD", Population >= 1000)
+  filter(Type == "CSD", Population >= min_pop)
 
 ######################## ADD PROPERTIES ##################################
 #save(calgary_intersect, file="Calgary_CSD.RData")

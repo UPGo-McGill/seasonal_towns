@@ -43,7 +43,7 @@ for(i in 1:nrow(CSD_tourism)){
   CSD_tourism$distance[i] = st_distance(CSD_tourism[i,], canada_CMA_c[CSD_tourism$distance[i],])
 }
 ##
-
+## Number of listings by CSD
 CSD_listings <- read_csv("data/CSD_counts.csv")
 
 CSD_tourism <- CSD_tourism%>%
@@ -53,12 +53,19 @@ CSD_tourism <- inner_join(CSD_tourism, CSD_listings)
 
 qc_tourism <- CSD_tourism%>%
   filter(PR_UID == "24")
+## Use: PR_Codes
 
+### REGRESSION ALL OF CA
 multi.fit = lm(Listings~tourism_naics+distance, data=CSD_tourism)
 summary(multi.fit)
 
-
 simple.fit = lm(Listings~tourism_naics, data=CSD_tourism)
+summary(simple.fit)
+
+### REGRESSION PROVINCE
+multi.fit = lm(Listings~tourism_naics+distance, data=qc_tourism)
+summary(multi.fit)
+simple.fit = lm(Listings~tourism_naics, data=qc_tourism)
 summary(simple.fit)
 
 ggplot(CSD_tourism)+
