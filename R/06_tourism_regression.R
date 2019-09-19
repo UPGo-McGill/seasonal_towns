@@ -15,7 +15,11 @@ source("R/05_tourism_and_travel_labour.R")
 #  summarise (tourism_naics = sum(Total))
 #sum(tt$tourism_naics)
 
-tourism_indicator <- codes %>% 
+load("data/tourism_codes.Rdata", .GlobalEnv)
+load("data/tourism_result.Rdata", .GlobalEnv)
+
+
+tourism_indicator <- tourism_codes %>% 
     group_by(GeoUID) %>% 
     summarise (tourism_naics = sum(Total))
 
@@ -47,8 +51,8 @@ CSD_tourism <- CSD_tourism%>%
 
 CSD_tourism <- inner_join(CSD_tourism, CSD_listings) 
 
-bc_tourism <- CST_tourism%>%
-  filter(PR_UID == "59")
+qc_tourism <- CSD_tourism%>%
+  filter(PR_UID == "24")
 
 multi.fit = lm(Listings~tourism_naics+distance, data=CSD_tourism)
 summary(multi.fit)

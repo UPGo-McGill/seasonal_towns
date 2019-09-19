@@ -11,9 +11,9 @@ property_blue_mountains <- property%>%
   filter(str_detect( City, "Blue Mountains"))
 property_mont_tremblant <- property%>%
   filter(str_detect( City, "Mont-Tremblant"))
-property_banff <- st_intersection(property, st_buffer(banff, 200))
+#property_banff <- st_intersection(property, st_buffer(banff, 200))
 
-## City census and centroid
+## City census and centroid for MTL
 mont_tremblant<- 
   get_census(
     dataset = "CA16", 
@@ -22,6 +22,83 @@ mont_tremblant<-
     geo_format = "sf") %>% 
   st_transform(3347)
 mont_tremblant_c <-  st_centroid(mont_tremblant)
+
+#################
+
+montreal<- 
+  get_census(
+    dataset = "CA16", 
+    regions = list(CMA = "24462"),  
+    level = "CMA",
+    geo_format = "sf") %>% 
+  st_transform(3347)
+
+montreal_c <-  st_centroid(montreal)
+##add a buffer"
+#radius_mtl <- radius_mtl+10000 
+radius_montreal <- st_buffer(montreal_c, 250000)
+
+montreal_intersect <- st_intersection(canada_CSD, radius_montreal)
+montreal_intersect <- montreal_intersect%>%
+  filter(Type == "CSD", Population >= 1500)
+
+montreal_alentours_all <- st_intersection(property, montreal_intersect)
+montreal_alentours_noCMA <- montreal_alentours_all %>%
+  filter((is.na(montreal_alentours_all$CMA_UID)==TRUE))
+montreal_alentours <- montreal_alentours_all %>%
+  filter(City!="Mont-Tremblant", Name!="Mont-Tremblant (V)")
+
+mtl_Listings <- montreal_alentours_all%>%
+  group_by(GeoUID)%>%
+  count()
+mtl_Listings$geometry <- NULL
+
+#mtl_Rev <- aggregate(montreal_alentours_noCMA$Annual_Revenue, by=list(GeoUID=montreal_alentours_noCMA$GeoUID), FUN=sum)
+
+#mtl_Data <- inner_join(mtl_Rev, mtl_Listings)%>%
+#  mutate(revperlist=x/n)
+
+mtl_Data <- inner_join(canada_CSD, mtl_Listings)
+mtl_Data <- mtl_Data%>%
+  mutate(List_per_dwelling=n/Dwellings)
+View(mtl_Data)
+
+#### MAPPING MTL/Mont Tremblant
+
+figureB <- 
+  tm_shape(radius_montreal)+
+  tm_borders(col="grey", lty="dashed")+
+  tm_shape(mtl_Data)+
+  tm_fill(col="List_per_dwelling",
+          palette="Oranges",  
+          border.col = "#f0f0f0",
+          border.alpha = .2,
+          breaks = c(0,0.025,0.05,0.075,0.1,0.15,Inf),
+          title="Listings per Dwellings")+
+  #   legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
+  tm_shape(canada_CSD)+
+  tm_borders(col="lightgrey")+
+  tm_shape(montreal)+
+  tm_borders(col="black")+
+  tm_shape(mont_tremblant)+
+  tm_borders(col="black")+
+  tm_legend(position = c("right", "bottom"),
+            bg.color = "white",
+            bg.alpha=.2,
+            width = .25, title.size = 1)+
+  tm_add_legend(type="fill",
+                col= "grey",
+                labels=c("Montreal CMA"),
+                border.lwd = NA,
+                alpha = 1)
+#                title="Listing Type")
+tmap_save(figureB, "output/figureB.png", width = 2400, height = 1500)
+
+
+##### Other areas
+
+
+
 
 pec<- 
   get_census(
@@ -94,24 +171,6 @@ vancouver_intersect <- vancouver_intersect%>%
 
 
 ##
-montreal<- 
-  get_census(
-    dataset = "CA16", 
-    regions = list(CMA = "24462"),  
-    level = "CMA",
-    geo_format = "sf") %>% 
-  st_transform(3347)
-
-montreal_c <-  st_centroid(montreal)
-##add a buffer"
-#radius_mtl <- radius_mtl+10000 
-radius_montreal <- st_buffer(montreal_c, 250000)
-
-montreal_intersect <- st_intersection(canada_CSD, radius_montreal)
-montreal_intersect <- montreal_intersect%>%
-  filter(Type == "CSD", Population >= 1500)
-
-########
 
 calgary<- 
   get_census(
@@ -128,10 +187,10 @@ calgary_intersect <- calgary_intersect%>%
   filter(Type == "CSD", Population >= 1000)
 
 ######################## ADD PROPERTIES ##################################
-save(calgary_intersect, file="Calgary_CSD.RData")
-save(montreal_intersect, file="Montreal_CSD.RData")
-save(vancouver_intersect, file="Vancouver_CSD.RData")
-save(toronto_intersect, file="Toronto_CSD.RData")
+#save(calgary_intersect, file="Calgary_CSD.RData")
+#save(montreal_intersect, file="Montreal_CSD.RData")
+#save(vancouver_intersect, file="Vancouver_CSD.RData")
+#save(toronto_intersect, file="Toronto_CSD.RData")
 
 
 ## Intersect property and radius around urban agglomerations
@@ -143,11 +202,6 @@ toronto_alentours <- toronto_alentours_noCMA %>%
   filter(City!="Prince Edward County", City!="The Blue Mountains", Name!= "Prince Edward County (CY)", Name!="The Blue Mountains (T)")
 
 
-montreal_alentours_all <- st_intersection(property, montreal_intersect)
-montreal_alentours_noCMA <- montreal_alentours_all %>%
-  filter((is.na(montreal_alentours_all$CMA_UID)==TRUE))
-montreal_alentours <- montreal_alentours_all %>%
-  filter(City!="Mont-Tremblant", Name!="Mont-Tremblant (V)")
 
 calgary_alentours_all <- st_intersection(property, calgary_intersect)
 calgary_alentours_noCMA <- calgary_alentours_all %>%
@@ -199,24 +253,6 @@ cal_Data <- cal_Data%>%
 View(cal_Data)
 
 
-#################
-
-mtl_Listings <- montreal_alentours_all%>%
-  group_by(GeoUID)%>%
-  count()
-mtl_Listings$geometry <- NULL
-
-#mtl_Rev <- aggregate(montreal_alentours_noCMA$Annual_Revenue, by=list(GeoUID=montreal_alentours_noCMA$GeoUID), FUN=sum)
-
-#mtl_Data <- inner_join(mtl_Rev, mtl_Listings)%>%
-#  mutate(revperlist=x/n)
-
-mtl_Data <- inner_join(canada_CSD, mtl_Listings)
-mtl_Data <- mtl_Data%>%
-  mutate(List_per_dwelling=n/Dwellings)
-View(mtl_Data)
-
-
 #######
 
 tor_Listings <- toronto_alentours_all%>%
@@ -255,34 +291,6 @@ figureA <-
                 alpha = 1)
 #                title="Listing Type")
 tmap_save(figureA, "output/figureA.png", width = 2400, height = 1500)
-
-
-figureB <- 
-  tm_shape(radius_montreal)+
-  tm_borders(col="grey", lty="dashed")+
-  tm_shape(mtl_Data)+
-  tm_fill(col="List_per_dwelling",
-          palette="Oranges",  
-          border.col = "#f0f0f0",
-          border.alpha = .2,
-         breaks = c(0,0.025,0.05,0.075,0.1,0.15,Inf),
-          title="Listings per Dwellings")+
-  #   legend.format=list(fun=function(x) paste0(formatC(x, digits=0, format="f"), " %")))+
-  tm_shape(canada_CSD)+
-  tm_borders(col="lightgrey")+
-    tm_shape(montreal)+
-    tm_borders(col="black")+
-  tm_legend(position = c("right", "bottom"),
-            bg.color = "white",
-            bg.alpha=.2,
-            width = .25, title.size = 1)+
-  tm_add_legend(type="fill",
-                col= "grey",
-                labels=c("Montreal CMA"),
-                border.lwd = NA,
-                alpha = 1)
-#                title="Listing Type")
-tmap_save(figureB, "output/figureB.png", width = 2400, height = 1500)
 
 
 figureC <- 

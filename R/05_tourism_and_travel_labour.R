@@ -254,7 +254,7 @@ ca_485990 <-
   mutate(code= 485990)
 
 
-df <- rbind(ca_561510,ca_561520, ca_561590,
+tourism_df <- rbind(ca_561510,ca_561520, ca_561590,
             #hotels, resorts, casino hotels, bnb
             ca_721111, ca_721113,  ca_721120, ca_721191, ca_721192, ca_721198,
             #motel:  ca_721114, 
@@ -276,31 +276,37 @@ df <- rbind(ca_561510,ca_561520, ca_561590,
             # ca_713110, ca_713210, ca_713910)
 
 
-df <- df%>%
+tourism_df <- tourism_df%>%
   filter(str_detect(PROV_CSD, "-"))%>%
   separate(PROV_CSD, c("GeoUID", "name"), " - ")
 
-codes <- df
+tourism_codes <- tourism_df
 
-df$name <- NULL
-df$code <- NULL
+tourism_df$name <- NULL
+tourism_df$code <- NULL
 
-result <- df %>% 
+tourism_result <- tourism_df %>% 
   group_by(GeoUID) %>% 
   summarise_each(list(sum))
 
-result <- inner_join(result,canada_CSD)
-result <- result%>%
+tourism_result <- inner_join(tourism_result,canada_CSD)
+tourism_result <- tourism_result%>%
   mutate(tourism_prop= Total/ Population)
 
-result%>%
+tourism_result%>%
   filter(Population>=1200)%>%
   filter(is.na(CMA_UID))%>%
   View()
 
-### ALTERNATIVE: Using size of businesses = number of employees
+save(tourism_result, file="data/tourism_result.RData")
+save(tourism_codes, file="data/tourism_codes.RData")
 
-codes_prop <- df %>%
+
+
+
+### ALTERNATIVE: Using size of businesses = number of employees
+## do not run
+codes_prop <- tourism_df %>%
   mutate(`1_4`= `1_4`*2.5)%>%
   mutate(`10_19`= `10_19`*14.5)%>%
   mutate(`100_199`= `100_199`*149.5)%>%
