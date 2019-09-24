@@ -13,7 +13,7 @@ library(nngeo)
 
 CMA_names <-
   list_census_regions("CA16") %>%
-  filter(level=="CMA")
+  filter(municipal_status == "B")
 
 CMA <-
   get_census("CA16",
@@ -21,8 +21,8 @@ CMA <-
              geo_format = "sf") %>% 
   st_transform(3347) %>% 
   inner_join(CMA_names, by = c("GeoUID" = "region")) %>% 
-  select(name = name.y, GeoUID, geometry) %>% 
-  st_set_agr(c(name = "identity", GeoUID = "identity"))
+  select(name = name.y, GeoUID, CMA_pop = Population, geometry) %>% 
+  st_set_agr(c(name = "identity", GeoUID = "identity", CMA_pop = "constant"))
 
 rm(CMA_names)
 
@@ -39,7 +39,7 @@ CSD <-
     regions = list(C = "1"),  
     level = "CSD",
     vectors =  c("v_CA16_4836", "v_CA16_4838", "v_CA16_4886", "v_CA16_4888",
-                 "v_CA16_2207"),
+                 "v_CA16_2207", "v_CA16_406"),
     geo_format = "sf") %>% 
   inner_join(CSD_names, by = c("GeoUID" = "region")) %>%
   st_transform(3347) %>%   
@@ -48,28 +48,13 @@ CSD <-
          -`Area (sq km)`) %>% 
   set_names(c("GeoUID", "population", "PR_UID", "CMA_UID", "geometry",
               "households_1", "renter", "households_2", "core_housing_need",
-              "median_income", "name")) %>% 
+              "median_income", "density", "name")) %>% 
   mutate(renter_pct = renter / households_1,
          core_housing_need_pct = core_housing_need / households_2) %>% 
   select(name, GeoUID, population:CMA_UID, renter_pct, core_housing_need_pct,
-         median_income, geometry)
+         median_income, density, geometry)
 
 rm(CSD_names)
-
-
-## Define suburb, central city and regional variables
-
-CSD <- 
-  CSD %>% 
-  mutate(geography = case_when(
-    map_lgl(name, ~{sum(str_detect(CMA$name, .x)) > 0})    ~ "central city",
-    (CMA_UID %in% CMA$GeoUID)                              ~ "suburb",
-    lengths(st_nn(st_centroid(geometry), 
-                  st_centroid(CMA), maxdist = 100000)) > 0 ~ "inner region",
-    lengths(st_nn(st_centroid(geometry), 
-                  st_centroid(CMA), maxdist = 250000)) > 0 ~ "outer region",
-    TRUE                                                   ~ "no region")) %>% 
-  select(-geometry, everything(), geometry)
 
 ## Add nearest_CMA and dist_to_CMA fields
 
@@ -85,7 +70,26 @@ CSD <-
   )
 
 rm(distances)
-  
+
+## Define suburb, central city and regional variables
+
+CSD <- 
+  CSD %>% 
+  group_by(nearest_CMA) %>% 
+  mutate(geography = case_when(
+    str_detect(nearest_CMA, name) == TRUE & 
+      (str_detect(nearest_CMA, "-") == TRUE | 
+         population == max(population) | name == "Victoria") ~ "central city",
+    (CMA_UID %in% CMA$GeoUID)                                ~ "suburb",
+    lengths(st_nn(st_centroid(geometry), 
+                  st_centroid(CMA), maxdist = 100000)) > 0   ~ "inner region",
+    lengths(st_nn(st_centroid(geometry), 
+                  st_centroid(CMA), maxdist = 250000)) > 0   ~ "outer region",
+    TRUE                                                     ~ "no region"
+  )) %>% 
+  ungroup() %>% 
+  select(-geometry, everything(), geometry)
+
 
 ### STR data ###################################################################
 
@@ -161,6 +165,8 @@ CSD <-
   rename(active_listings_2018 = n) %>% 
   left_join(CSD, .)
 
+rm(FREH)
+
 
 ### Add tourism ################################################################
 
@@ -185,14 +191,26 @@ CSD <-
          active_listings_2018_per_cap = active_listings_2018 / population,
          tourism_per_cap = tourism_naics / population)
 
+
+CSD %>% 
+  filter(geography == "central city") %>% 
+  group_by()
+
+
+
+
 CMA_attributes <-
   CSD %>% 
   pull(nearest_CMA) %>% 
   map_df(~{
-    CSD %>% st_drop_geometry() %>% filter(str_detect(.x, name)) %>% 
-      filter(population == max(population)) %>% 
+    CSD %>% 
+      st_drop_geometry() %>% 
+      group_by(nearest_CMA) %>% 
+      filter(geography == "central city", nearest_CMA == .x, 
+             (population == max(population) | name == "Victoria")) %>% 
+      ungroup() %>% 
       select(renter_pct, core_housing_need_pct, median_income, 
-             active_listings_2018, tourism_per_cap)
+             active_listings_2018_per_cap, tourism_per_cap)
   })
 
 CSD <- 
@@ -206,6 +224,15 @@ CSD <-
 
 rm(CMA_attributes)
 
+CSD <- 
+  CSD %>% 
+  mutate(CMA_total_pop = map_dbl(nearest_CMA, ~{
+    CMA %>% 
+      st_drop_geometry() %>% 
+      filter(name == .x) %>% 
+      pull(CMA_pop)
+  }))
+
 
 ### Save output ################################################################
 
@@ -213,6 +240,3 @@ save(CMA, file = "data/CMA.Rdata")
 save(CSD, file = "data/CSD.Rdata")
 save(FREH, file = "data/FREH.Rdata")
 save(property, file = "data/property.Rdata")
-
-
-

@@ -5,7 +5,6 @@ library(sf)
 library(strr)
 library(upgo)
 library(cancensus)
-library(ggspatial)
 
 load("data/CMA.Rdata")
 load("data/CSD.Rdata")
@@ -18,25 +17,31 @@ load("data/property.Rdata")
 # Predict active listings
 
 CSD %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(active_listings_per_cap ~ tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + geography + CMA_renter +
-       CMA_core_housing + CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + geography + 
+       CMA_renter + CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH
 
 CSD %>% 
-  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + core_housing_need_pct + 
-       median_income + geography + CMA_renter + CMA_core_housing + CMA_income + 
-       CMA_tourism + CMA_active, data = .) %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
+  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + 
+       core_housing_need_pct + median_income + density + geography + 
+       CMA_renter + CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH with active listings as IV
 
 CSD %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(FREH_per_cap ~ active_listings_per_cap + tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + geography + CMA_renter + 
-       CMA_core_housing + CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + geography + 
+       CMA_renter + CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 
@@ -46,8 +51,10 @@ CSD %>%
 
 CSD %>%
   filter(geography == "central city") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(active_listings_per_cap ~ tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_total_pop, 
+     data = .) %>% 
   summary()
 
 # Predict FREH
@@ -55,7 +62,7 @@ CSD %>%
 CSD %>%
   filter(geography == "central city") %>% 
   lm(FREH_per_cap ~ tourism_per_cap + renter_pct + core_housing_need_pct + 
-       median_income, data = .) %>% 
+       median_income + density + CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH with active listings as IV
@@ -63,7 +70,8 @@ CSD %>%
 CSD %>%
   filter(geography == "central city") %>% 
   lm(FREH_per_cap ~ active_listings_per_cap + tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_total_pop, 
+     data = .) %>% 
   summary()
 
 
@@ -73,27 +81,33 @@ CSD %>%
 
 CSD %>%
   filter(geography == "suburb") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(active_listings_per_cap ~ tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH
 
 CSD %>%
   filter(geography == "suburb") %>% 
-  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + core_housing_need_pct + 
-       median_income + CMA_renter + CMA_core_housing + CMA_income + 
-       CMA_tourism + CMA_active, data = .) %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
+  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH with active listings as IV
 
 CSD %>%
   filter(geography == "suburb") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(FREH_per_cap ~ active_listings_per_cap + tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 
@@ -103,28 +117,35 @@ CSD %>%
 
 CSD %>%
   filter(geography == "inner region") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(active_listings_per_cap ~ tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH
 
 CSD %>%
   filter(geography == "inner region") %>% 
-  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + core_housing_need_pct + 
-       median_income + CMA_renter + CMA_core_housing + CMA_income + 
-       CMA_tourism + CMA_active, data = .) %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
+  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH with active listings as IV
 
 CSD %>%
   filter(geography == "inner region") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(FREH_per_cap ~ active_listings_per_cap + tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
+
 
 
 ### Outer region ###############################################################
@@ -133,28 +154,35 @@ CSD %>%
 
 CSD %>%
   filter(geography == "outer region") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(active_listings_per_cap ~ tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH
 
 CSD %>%
   filter(geography == "outer region") %>% 
-  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + core_housing_need_pct + 
-       median_income + CMA_renter + CMA_core_housing + CMA_income + 
-       CMA_tourism + CMA_active, data = .) %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
+  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH with active listings as IV
 
 CSD %>%
   filter(geography == "outer region") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(FREH_per_cap ~ active_listings_per_cap + tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
+
 
 
 ### No region ##################################################################
@@ -163,25 +191,32 @@ CSD %>%
 
 CSD %>%
   filter(geography == "no region") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(active_listings_per_cap ~ tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH
 
 CSD %>%
   filter(geography == "no region") %>% 
-  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + core_housing_need_pct + 
-       median_income + CMA_renter + CMA_core_housing + CMA_income + 
-       CMA_tourism + CMA_active, data = .) %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
+  lm(FREH_per_cap ~ tourism_per_cap + renter_pct + 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
 
 # Predict FREH with active listings as IV
 
 CSD %>%
   filter(geography == "no region") %>% 
+  filter(population >= 1500, active_listings >= 5) %>%
   lm(FREH_per_cap ~ active_listings_per_cap + tourism_per_cap + renter_pct + 
-       core_housing_need_pct + median_income + CMA_renter + CMA_core_housing + 
-       CMA_income + CMA_tourism + CMA_active, data = .) %>% 
+       core_housing_need_pct + median_income + density + CMA_renter + 
+       CMA_core_housing + CMA_income + CMA_tourism + CMA_active +
+       CMA_total_pop, data = .) %>% 
   summary()
+
